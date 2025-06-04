@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">Milk Store</string>
+    
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to continue</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button">LOGIN</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="register_prompt">Don\'t have an account?</string>
+    <string name="register_link">Sign Up</string>
+    
+    <string name="nav_home">Home</string>
+    <string name="nav_shop">Shop</string>
+    <string name="nav_chat">Chat</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_profile">Profile</string>
+    
+    <string name="welcome_message">Welcome to Milk Store</string>
+    <string name="search_hint">Search for milk products...</string>
+    <string name="categories_title">Categories</string>
+    <string name="featured_products_title">Featured Products</string>
+    <string name="special_offer_title">Special Offer!</string>
+    <string name="special_offer_desc">Get 20% off on your first order</string>
+    
+    <string name="shop_title">Shop</string>
+    <string name="search_products_hint">Search products...</string>
+    <string name="filter_button">Filter</string>
+    <string name="shop_coming_soon">Shop Coming Soon!</string>
+    <string name="shop_description">We\'re preparing fresh milk products for you</string>
+    
+    <string name="chat_title">Chat</string>
+    <string name="no_messages">No Messages Yet</string>
+    <string name="start_conversation">Start a conversation with our support team</string>
+    <string name="start_chat">Start Chat</string>
+    
+    <string name="map_title">Store Locations</string>
+    <string name="map_coming_soon">Map Coming Soon!</string>
+    <string name="map_description">Find nearby milk stores and delivery points</string>
+    <string name="nearby_stores">Nearby Stores</string>
+    
+    <string name="profile_name">John Doe</string>
+    <string name="profile_email">john.doe@example.com</string>
+    <string name="personal_info_section">PERSONAL INFORMATION</string>
+    <string name="app_settings_section">APP SETTINGS</string>
+    <string name="support_section">SUPPORT</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="order_history">Order History</string>
+    <string name="notifications">Notifications</string>
+    <string name="help_support">Help &amp; Support</string>
+    <string name="logout">Logout</string>
+    <string name="app_version">Version 1.0.0</string>
+    
+    <string name="coming_soon">Coming Soon!</string>
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="retry">Retry</string>
+</resources>
