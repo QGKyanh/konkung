@@ -11,7 +11,7 @@ import com.prm392.konkung.screens.chat.ChatFragment;
 import com.prm392.konkung.screens.home.HomeFragment;
 import com.prm392.konkung.screens.map.MapFragment;
 import com.prm392.konkung.screens.profile.ProfileFragment;
-import com.prm392.konkung.screens.shop.ShopFragment;
+import com.prm392.konkung.screens.products.ProductListFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
         
         // Load default fragment
         if (savedInstanceState == null) {
-            loadFragment(new HomeFragment());
+            loadFragment(new ProductListFragment());
+            bottomNavigationView.setSelectedItemId(R.id.nav_shop);
         }
     }
 
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
             } else if (itemId == R.id.nav_shop) {
-                selectedFragment = new ShopFragment();
+                selectedFragment = new ProductListFragment();
             } else if (itemId == R.id.nav_chat) {
                 selectedFragment = new ChatFragment();
             } else if (itemId == R.id.nav_map) {
