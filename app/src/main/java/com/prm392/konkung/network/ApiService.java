@@ -1,7 +1,9 @@
 package com.prm392.konkung.network;
 
+import com.prm392.konkung.models.Blog;
 import com.prm392.konkung.models.Product;
 import com.prm392.konkung.network.responses.BaseResponse;
+import com.prm392.konkung.network.responses.BlogListData;
 import com.prm392.konkung.network.responses.ProductListData;
 
 import retrofit2.Call;
@@ -37,4 +39,17 @@ public interface ApiService {
             @Query("page") int page,
             @Query("pageSize") int pageSize
     );
+    
+    // Blog endpoints
+    @GET("api/posts")
+    Call<BaseResponse<BlogListData>> getAllBlogs();
+    
+    @GET("api/posts")
+    Call<BaseResponse<BlogListData>> getAllBlogs(
+            @Query("page") int page,
+            @Query("pageSize") int pageSize
+    );
+    
+    @GET("api/posts/{id}")
+    Call<BaseResponse<Blog>> getBlog(@Path("id") String blogId);
 }
