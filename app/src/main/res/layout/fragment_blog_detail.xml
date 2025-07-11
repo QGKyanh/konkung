@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header with Back Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@color/white"
+            android:elevation="4dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/buttonBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_left"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:layout_marginEnd="16dp"
+                app:tint="@color/black" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Chi tiết bài viết"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+        <!-- Loading Indicator -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="32dp"
+            android:visibility="gone" />
+
+        <!-- Content View -->
+        <LinearLayout
+            android:id="@+id/contentView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Blog Thumbnail -->
+            <ImageView
+                android:id="@+id/imageViewThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_milk_logo" />
+
+            <!-- Blog Info Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@color/white">
+
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/textViewTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Blog Title"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:lineSpacingMultiplier="1.2"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Meta Description -->
+                <TextView
+                    android:id="@+id/textViewMetaDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Meta description"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_secondary"
+                    android:textStyle="italic"
+                    android:lineSpacingMultiplier="1.3"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Author and Date Info -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/info_background"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textViewAuthor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tác giả: Admin"
+                            android:textSize="14sp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            android:drawableStart="@drawable/ic_person"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical" />
+
+                        <TextView
+                            android:id="@+id/textViewDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="11/07/2025"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
+                            android:drawableStart="@drawable/ic_calendar"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <!-- Status Badge -->
+                    <LinearLayout
+                        android:id="@+id/statusBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="@drawable/status_badge_background"
+                        android:padding="8dp"
+                        android:gravity="center_vertical">
+
+                        <View
+                            android:id="@+id/statusIndicator"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="@drawable/circle_background"
+                            android:layout_marginEnd="6dp" />
+
+                        <TextView
+                            android:id="@+id/textViewStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hoạt động"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Blog Content Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:layout_marginTop="8dp"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nội dung bài viết"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Content Text -->
+                <TextView
+                    android:id="@+id/textViewContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Blog content will be displayed here..."
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:lineSpacingMultiplier="1.5"
+                    android:justificationMode="inter_word" />
+
+            </LinearLayout>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/white"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/buttonShare"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Chia sẻ"
+                    android:textColor="@color/white"
+                    android:background="@drawable/button_secondary_background"
+                    android:layout_marginEnd="8dp"
+                    android:drawableStart="@drawable/ic_share"
+                    android:drawablePadding="8dp"
+                    android:gravity="center" />
+
+                <Button
+                    android:id="@+id/buttonBookmark"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Lưu bài viết"
+                    android:textColor="@color/white"
+                    android:background="@drawable/button_primary_background"
+                    android:layout_marginStart="8dp"
+                    android:drawableStart="@drawable/ic_bookmark"
+                    android:drawablePadding="8dp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!-- Bottom Spacing -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
