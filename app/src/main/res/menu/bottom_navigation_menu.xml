@@ -12,14 +12,14 @@
         android:title="Shop" />
     
     <item
+        android:id="@+id/nav_blog"
+        android:icon="@drawable/ic_article"
+        android:title="Blog" />
+    
+    <item
         android:id="@+id/nav_chat"
         android:icon="@drawable/ic_chat"
         android:title="Chat" />
-    
-    <item
-        android:id="@+id/nav_map"
-        android:icon="@drawable/ic_map"
-        android:title="Map" />
     
     <item
         android:id="@+id/nav_profile"
