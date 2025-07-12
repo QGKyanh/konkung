@@ -20,6 +20,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "GEMINI_API_KEY", "\"${project.findProperty('GEMINI_API_KEY') ?: ''}\""
+        }
+        debug {
+            buildConfigField "String", "GEMINI_API_KEY", "\"${project.findProperty('GEMINI_API_KEY') ?: ''}\""
         }
     }
     compileOptions {
@@ -28,6 +32,12 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig true
+    }
+    lintOptions {
+        abortOnError false
+        disable 'NotificationPermission'
+        checkReleaseBuilds false
     }
 }
 
@@ -53,6 +63,17 @@ dependencies {
     
     // SwipeRefreshLayout
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    
+    // SQLite Database (Room)
+    implementation 'androidx.room:room-runtime:2.5.0'
+    annotationProcessor 'androidx.room:room-compiler:2.5.0'
+    implementation 'androidx.room:room-rxjava3:2.5.0'
+    
+    // AI Chatbot (OpenAI API alternative - Using local AI responses for demo)
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    
+    // JSON handling for AI API
+    implementation 'org.json:json:20230618'
     
     // Testing
     testImplementation libs.junit

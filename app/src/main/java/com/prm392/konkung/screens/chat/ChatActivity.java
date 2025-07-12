@@ -5,16 +5,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +22,7 @@ import com.prm392.konkung.repository.ChatRepository;
 
 import java.util.List;
 
-public class ChatFragment extends Fragment {
+public class ChatActivity extends AppCompatActivity {
     
     private RecyclerView recyclerViewChat;
     private EditText editTextMessage;
@@ -35,38 +32,41 @@ public class ChatFragment extends Fragment {
     private ChatRepository chatRepository;
     private Handler mainHandler;
     
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_chat, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_chat);
         
-        initializeComponents(view);
-        setupViews(view);
+        setupToolbar();
+        initializeComponents();
+        setupViews();
         loadChatHistory();
-        
-        // Send welcome message if this is a new session
         sendWelcomeMessage();
     }
     
-    private void initializeComponents(View view) {
-        recyclerViewChat = view.findViewById(R.id.recyclerViewChat);
-        editTextMessage = view.findViewById(R.id.editTextMessage);
-        buttonSend = view.findViewById(R.id.buttonSend);
-        buttonClearChat = view.findViewById(R.id.buttonClearChat);
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Milk Expert Assistant");
+        }
+    }
+    
+    private void initializeComponents() {
+        recyclerViewChat = findViewById(R.id.recyclerViewChat);
+        editTextMessage = findViewById(R.id.editTextMessage);
+        buttonSend = findViewById(R.id.buttonSend);
+        buttonClearChat = findViewById(R.id.buttonClearChat);
         
         chatAdapter = new ChatAdapter();
-        chatRepository = ChatRepository.getInstance(requireContext());
+        chatRepository = ChatRepository.getInstance(this);
         mainHandler = new Handler(Looper.getMainLooper());
     }
 
-    private void setupViews(View view) {
+    private void setupViews() {
         // Setup RecyclerView
-        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerViewChat.setLayoutManager(layoutManager);
         recyclerViewChat.setAdapter(chatAdapter);
@@ -123,7 +123,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onError(String error) {
                 mainHandler.post(() -> {
-                    Toast.makeText(requireContext(), "Failed to send message: " + error, 
+                    Toast.makeText(ChatActivity.this, "Failed to send message: " + error, 
                             Toast.LENGTH_SHORT).show();
                 });
             }
@@ -145,7 +145,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onError(String error) {
                 mainHandler.post(() -> {
-                    Toast.makeText(requireContext(), "Failed to load chat history: " + error, 
+                    Toast.makeText(ChatActivity.this, "Failed to load chat history: " + error, 
                             Toast.LENGTH_SHORT).show();
                 });
             }
@@ -158,7 +158,7 @@ public class ChatFragment extends Fragment {
             public void onSuccess(List<ChatMessage> messages) {
                 mainHandler.post(() -> {
                     chatAdapter.clearMessages();
-                    Toast.makeText(requireContext(), "Chat cleared", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "Chat cleared", Toast.LENGTH_SHORT).show();
                     sendWelcomeMessage();
                 });
             }
@@ -166,7 +166,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onError(String error) {
                 mainHandler.post(() -> {
-                    Toast.makeText(requireContext(), "Failed to clear chat: " + error, 
+                    Toast.makeText(ChatActivity.this, "Failed to clear chat: " + error, 
                             Toast.LENGTH_SHORT).show();
                 });
             }
@@ -204,5 +204,14 @@ public class ChatFragment extends Fragment {
         if (chatAdapter.getItemCount() > 0) {
             recyclerViewChat.smoothScrollToPosition(chatAdapter.getItemCount() - 1);
         }
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
