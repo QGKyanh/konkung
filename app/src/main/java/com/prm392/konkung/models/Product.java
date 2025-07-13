@@ -153,23 +153,43 @@ public class Product {
 
     // Helper methods
     public double getCurrentPrice() {
-        return salePrice > 0 ? salePrice : originalPrice;
+        try {
+            return salePrice > 0 ? salePrice : originalPrice;
+        } catch (Exception e) {
+            return 0.0;
+        }
     }
 
     public boolean isOnSale() {
-        return salePrice > 0 && salePrice < originalPrice;
+        try {
+            return salePrice > 0 && salePrice < originalPrice;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public double getDiscountPercentage() {
-        if (!isOnSale()) return 0;
-        return ((originalPrice - salePrice) / originalPrice) * 100;
+        try {
+            if (!isOnSale()) return 0;
+            return ((originalPrice - salePrice) / originalPrice) * 100;
+        } catch (Exception e) {
+            return 0.0;
+        }
     }
 
     public boolean isAvailable() {
-        return quantity > 0 && "SELLING".equals(status);
+        try {
+            return quantity > 0 && "SELLING".equals(status);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean isPreOrder() {
-        return "PREORDER".equals(status);
+        try {
+            return "PREORDER".equals(status);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
