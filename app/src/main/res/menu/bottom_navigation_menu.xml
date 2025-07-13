@@ -20,10 +20,14 @@
         android:id="@+id/nav_blog"
         android:icon="@drawable/ic_article"
         android:title="Blog" />
+        <item
+        android:id="@+id/nav_cart"
+        android:icon="@drawable/ic_cart"
+        android:title="Cart" />
     
     <item
-        android:id="@+id/nav_chat"
-        android:icon="@drawable/ic_chat"
-        android:title="Chat" />
+        android:id="@+id/nav_more"
+        android:icon="@drawable/ic_help"
+        android:title="More" />
     
 </menu>

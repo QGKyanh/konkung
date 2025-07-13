@@ -20,6 +20,7 @@ import com.prm392.konkung.R;
 import com.prm392.konkung.models.Product;
 import com.prm392.konkung.repository.ProductRepository;
 import com.prm392.konkung.utils.CartManager;
+import com.prm392.konkung.screens.checkout.CheckoutFragment;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -291,20 +292,13 @@ public class ProductDetailFragment extends Fragment {
             // Add to cart first
             cartManager.addToCart(currentProduct);
             
-            // Navigate to checkout or cart screen
-            // For now, just show a message
-            String message = currentProduct.isPreOrder() ? 
-                    "Chuyển đến thanh toán (đặt trước)" : 
-                    "Chuyển đến thanh toán";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            
-            // TODO: Navigate to checkout screen
-            // CartFragment cartFragment = new CartFragment();
-            // getParentFragmentManager()
-            //     .beginTransaction()
-            //     .replace(R.id.fragment_container, cartFragment)
-            //     .addToBackStack(null)
-            //     .commit();
+            // Navigate to checkout screen
+            CheckoutFragment checkoutFragment = new CheckoutFragment();
+            getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, checkoutFragment)
+                .addToBackStack(null)
+                .commit();
         }
     }
 

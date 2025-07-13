@@ -15,6 +15,8 @@ public class BaseResponse<T> {
     @SerializedName("data")
     private T data;
 
+    private String token;
+
     // Constructors
     public BaseResponse() {}
 
@@ -30,6 +32,9 @@ public class BaseResponse<T> {
 
     public T getData() { return data; }
     public void setData(T data) { this.data = data; }
+
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
 
     public boolean isSuccess() {
         return statusCode == 200 && "Success".equals(status);

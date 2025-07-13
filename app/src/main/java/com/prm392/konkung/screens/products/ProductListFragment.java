@@ -147,8 +147,20 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
     }
 
     private void initRepositories() {
-        productRepository = ProductRepository.getInstance();
-        cartManager = CartManager.getInstance(requireContext());
+        try {
+            productRepository = ProductRepository.getInstance();
+            if (getContext() != null) {
+                cartManager = CartManager.getInstance(getContext());
+            } else {
+                cartManager = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            cartManager = null;
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Lỗi khởi tạo giỏ hàng", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void loadProducts() {
@@ -277,14 +289,23 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
 
     @Override
     public void onAddToCartClick(Product product) {
-        if (product.isAvailable() || product.isPreOrder()) {
-            cartManager.addToCart(product);
-            String message = product.isPreOrder() ? 
-                    "Đã thêm vào giỏ hàng (đặt trước)" : 
-                    "Đã thêm vào giỏ hàng";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getContext(), "Sản phẩm không khả dụng", Toast.LENGTH_SHORT).show();
+        try {
+            if (product.isAvailable() || product.isPreOrder()) {
+                if (cartManager != null) {
+                    cartManager.addToCart(product);
+                    String message = product.isPreOrder() ? 
+                            "Đã thêm vào giỏ hàng (đặt trước)" : 
+                            "Đã thêm vào giỏ hàng";
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Lỗi: Không thể thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getContext(), "Sản phẩm không khả dụng", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

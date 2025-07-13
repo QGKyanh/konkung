@@ -22,16 +22,26 @@ public class CartManager {
     private Gson gson;
 
     private CartManager(Context context) {
-        this.prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        this.gson = new Gson();
-        loadCartItems();
+        try {
+            this.prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            this.gson = new Gson();
+            loadCartItems();
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.cartItems = new ArrayList<>();
+        }
     }
 
     public static synchronized CartManager getInstance(Context context) {
-        if (instance == null) {
-            instance = new CartManager(context.getApplicationContext());
+        try {
+            if (instance == null) {
+                instance = new CartManager(context.getApplicationContext());
+            }
+            return instance;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        return instance;
     }
 
     public static CartManager getInstance() {
@@ -42,17 +52,26 @@ public class CartManager {
     }
 
     private void loadCartItems() {
-        String cartJson = prefs.getString(CART_ITEMS_KEY, "[]");
-        Type listType = new TypeToken<List<CartItem>>(){}.getType();
-        cartItems = gson.fromJson(cartJson, listType);
-        if (cartItems == null) {
+        try {
+            String cartJson = prefs.getString(CART_ITEMS_KEY, "[]");
+            Type listType = new TypeToken<List<CartItem>>(){}.getType();
+            cartItems = gson.fromJson(cartJson, listType);
+            if (cartItems == null) {
+                cartItems = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             cartItems = new ArrayList<>();
         }
     }
 
     private void saveCartItems() {
-        String cartJson = gson.toJson(cartItems);
-        prefs.edit().putString(CART_ITEMS_KEY, cartJson).apply();
+        try {
+            String cartJson = gson.toJson(cartItems);
+            prefs.edit().putString(CART_ITEMS_KEY, cartJson).apply();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void addToCart(Product product) {
@@ -60,79 +79,152 @@ public class CartManager {
     }
 
     public void addToCart(Product product, int quantity) {
-        for (CartItem item : cartItems) {
-            if (item.getProduct().getId().equals(product.getId())) {
-                item.setQuantity(item.getQuantity() + quantity);
-                saveCartItems();
-                return;
+        try {
+            if (product == null) return;
+            
+            for (CartItem item : cartItems) {
+                if (item.getProduct() != null && item.getProduct().getId() != null && 
+                    item.getProduct().getId().equals(product.getId())) {
+                    item.setQuantity(item.getQuantity() + quantity);
+                    saveCartItems();
+                    return;
+                }
             }
+            cartItems.add(new CartItem(product, quantity));
+            saveCartItems();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        cartItems.add(new CartItem(product, quantity));
-        saveCartItems();
     }
 
     public void removeFromCart(String productId) {
-        cartItems.removeIf(item -> item.getProduct().getId().equals(productId));
-        saveCartItems();
+        try {
+            if (productId == null) return;
+            
+            List<CartItem> itemsToRemove = new ArrayList<>();
+            for (CartItem item : cartItems) {
+                if (item.getProduct() != null && item.getProduct().getId() != null && 
+                    item.getProduct().getId().equals(productId)) {
+                    itemsToRemove.add(item);
+                }
+            }
+            cartItems.removeAll(itemsToRemove);
+            saveCartItems();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateQuantity(String productId, int quantity) {
-        if (quantity <= 0) {
-            removeFromCart(productId);
-            return;
-        }
-        
-        for (CartItem item : cartItems) {
-            if (item.getProduct().getId().equals(productId)) {
-                item.setQuantity(quantity);
-                saveCartItems();
+        try {
+            if (productId == null) return;
+            
+            if (quantity <= 0) {
+                removeFromCart(productId);
                 return;
             }
+            
+            for (CartItem item : cartItems) {
+                if (item.getProduct() != null && item.getProduct().getId() != null && 
+                    item.getProduct().getId().equals(productId)) {
+                    item.setQuantity(quantity);
+                    saveCartItems();
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     public void clearCart() {
-        cartItems.clear();
-        saveCartItems();
+        try {
+            cartItems.clear();
+            saveCartItems();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public List<CartItem> getCartItems() {
-        return new ArrayList<>(cartItems);
+        try {
+            return new ArrayList<>(cartItems);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public int getCartItemCount() {
-        int count = 0;
-        for (CartItem item : cartItems) {
-            count += item.getQuantity();
+        try {
+            int count = 0;
+            for (CartItem item : cartItems) {
+                count += item.getQuantity();
+            }
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
-        return count;
     }
 
     public double getTotalPrice() {
-        double total = 0.0;
-        for (CartItem item : cartItems) {
-            total += item.getTotalPrice();
+        try {
+            double total = 0.0;
+            for (CartItem item : cartItems) {
+                total += item.getTotalPrice();
+            }
+            return total;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0.0;
         }
-        return total;
     }
 
     public double getTotalSavings() {
-        double savings = 0.0;
-        for (CartItem item : cartItems) {
-            savings += item.getSavings();
+        try {
+            double savings = 0.0;
+            for (CartItem item : cartItems) {
+                savings += item.getSavings();
+            }
+            return savings;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0.0;
         }
-        return savings;
     }
 
     public boolean isInCart(String productId) {
-        return cartItems.stream().anyMatch(item -> item.getProduct().getId().equals(productId));
+        try {
+            if (productId == null) return false;
+            
+            for (CartItem item : cartItems) {
+                if (item.getProduct() != null && item.getProduct().getId() != null && 
+                    item.getProduct().getId().equals(productId)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public int getProductQuantityInCart(String productId) {
-        return cartItems.stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .mapToInt(CartItem::getQuantity)
-                .findFirst()
-                .orElse(0);
+        try {
+            if (productId == null) return 0;
+            
+            for (CartItem item : cartItems) {
+                if (item.getProduct() != null && item.getProduct().getId() != null && 
+                    item.getProduct().getId().equals(productId)) {
+                    return item.getQuantity();
+                }
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }
