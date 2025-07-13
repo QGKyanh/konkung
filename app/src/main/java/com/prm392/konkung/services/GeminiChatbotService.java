@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class GeminiChatbotService {
     // Use BuildConfig for API key from local.properties, fallback to hardcoded for demo
-    private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY.isEmpty() ? 
-            "AIzaSyDtJ9V2gW4S6XB7Hz-ho1Kz_EdpPwdx3xo" : BuildConfig.GEMINI_API_KEY;
+    private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY;
     private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
     
     private OkHttpClient client = new OkHttpClient();
@@ -19,10 +18,19 @@ public class GeminiChatbotService {
     
     public void generateAIResponse(String userMessage, ResponseCallback callback) {
         // Always use Gemini AI
-        if (!GEMINI_API_KEY.isEmpty() && !"null".equals(GEMINI_API_KEY)) {
+        if (GEMINI_API_KEY != null && !GEMINI_API_KEY.isEmpty() && !"null".equals(GEMINI_API_KEY)) {
             callGemini(userMessage, callback);
         } else {
-            callback.onError("API key không được cấu hình. Vui lòng thêm GEMINI_API_KEY vào local.properties");
+            String errorMsg = "API key không được cấu hình. ";
+            if (GEMINI_API_KEY == null) {
+                errorMsg += "GEMINI_API_KEY is null. ";
+            } else if (GEMINI_API_KEY.isEmpty()) {
+                errorMsg += "GEMINI_API_KEY is empty. ";
+            } else if ("null".equals(GEMINI_API_KEY)) {
+                errorMsg += "GEMINI_API_KEY is 'null' string. ";
+            }
+            errorMsg += "Vui lòng thêm GEMINI_API_KEY vào local.properties và rebuild project.";
+            callback.onError(errorMsg);
         }
     }
     
