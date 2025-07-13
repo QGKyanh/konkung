@@ -74,7 +74,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         private TextView textDiscountPercentage;
         private MaterialButton buttonMinus;
         private MaterialButton buttonPlus;
-        private MaterialButton buttonRemove;
+        private ImageView buttonRemove;
         private View discountBadge;
 
         public CartViewHolder(@NonNull View itemView) {
@@ -90,70 +90,101 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             buttonMinus = itemView.findViewById(R.id.buttonMinus);
             buttonPlus = itemView.findViewById(R.id.buttonPlus);
             buttonRemove = itemView.findViewById(R.id.buttonRemove);
-            discountBadge = itemView.findViewById(R.id.discountBadge);
+            // discountBadge không tồn tại trong item_cart.xml, nên comment lại
+            // discountBadge = itemView.findViewById(R.id.discountBadge);
         }
 
         public void bind(CartItem cartItem) {
-            // Product image
-            Glide.with(itemView.getContext())
-                    .load(cartItem.getProduct().getThumbnail())
-                    .transform(new RoundedCorners(12))
-                    .placeholder(R.drawable.ic_milk_logo)
-                    .error(R.drawable.ic_milk_logo)
-                    .into(imageProduct);
+            try {
+                // Product image
+                if (imageProduct != null) {
+                    Glide.with(itemView.getContext())
+                            .load(cartItem.getProduct().getThumbnail())
+                            .transform(new RoundedCorners(12))
+                            .placeholder(R.drawable.ic_milk_logo)
+                            .error(R.drawable.ic_milk_logo)
+                            .into(imageProduct);
+                }
 
-            // Product info
-            textProductName.setText(cartItem.getProduct().getName());
-            textProductBrand.setText(cartItem.getProduct().getBrand());
+                // Product info
+                if (textProductName != null) {
+                    textProductName.setText(cartItem.getProduct().getName());
+                }
+                if (textProductBrand != null) {
+                    textProductBrand.setText(cartItem.getProduct().getBrand());
+                }
 
-            // Price handling
-            if (cartItem.getProduct().isOnSale()) {
-                textCurrentPrice.setText(currencyFormat.format(cartItem.getProduct().getSalePrice()));
-                textOriginalPrice.setText(currencyFormat.format(cartItem.getProduct().getOriginalPrice()));
-                textOriginalPrice.setPaintFlags(textOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                textOriginalPrice.setVisibility(View.VISIBLE);
+                // Price handling
+                if (cartItem.getProduct().isOnSale()) {
+                    if (textCurrentPrice != null) {
+                        textCurrentPrice.setText(currencyFormat.format(cartItem.getProduct().getSalePrice()));
+                    }
+                    if (textOriginalPrice != null) {
+                        textOriginalPrice.setText(currencyFormat.format(cartItem.getProduct().getOriginalPrice()));
+                        textOriginalPrice.setPaintFlags(textOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                        textOriginalPrice.setVisibility(View.VISIBLE);
+                    }
 
-                textDiscountPercentage
-                        .setText(String.format("-%d%%", (int) cartItem.getProduct().getDiscountPercentage()));
-                discountBadge.setVisibility(View.VISIBLE);
-            } else {
-                textCurrentPrice.setText(currencyFormat.format(cartItem.getProduct().getOriginalPrice()));
-                textOriginalPrice.setVisibility(View.GONE);
-                discountBadge.setVisibility(View.GONE);
-            }
-
-            // Quantity
-            textQuantity.setText(String.valueOf(cartItem.getQuantity()));
-
-            // Total price for this item
-            textTotalPrice.setText(currencyFormat.format(cartItem.getTotalPrice()));
-
-            // Quantity buttons
-            buttonMinus.setOnClickListener(v -> {
-                int newQuantity = cartItem.getQuantity() - 1;
-                if (newQuantity >= 0) {
-                    if (listener != null) {
-                        listener.onQuantityChanged(cartItem, newQuantity);
+                    if (textDiscountPercentage != null) {
+                        textDiscountPercentage
+                                .setText(String.format("-%d%%", (int) cartItem.getProduct().getDiscountPercentage()));
+                        textDiscountPercentage.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    if (textCurrentPrice != null) {
+                        textCurrentPrice.setText(currencyFormat.format(cartItem.getProduct().getOriginalPrice()));
+                    }
+                    if (textOriginalPrice != null) {
+                        textOriginalPrice.setVisibility(View.GONE);
+                    }
+                    if (textDiscountPercentage != null) {
+                        textDiscountPercentage.setVisibility(View.GONE);
                     }
                 }
-            });
 
-            buttonPlus.setOnClickListener(v -> {
-                int newQuantity = cartItem.getQuantity() + 1;
-                if (listener != null) {
-                    listener.onQuantityChanged(cartItem, newQuantity);
+                // Quantity
+                if (textQuantity != null) {
+                    textQuantity.setText(String.valueOf(cartItem.getQuantity()));
                 }
-            });
 
-            // Remove button
-            buttonRemove.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onRemoveItem(cartItem);
+                // Total price for this item
+                if (textTotalPrice != null) {
+                    textTotalPrice.setText(currencyFormat.format(cartItem.getTotalPrice()));
                 }
-            });
 
-            // Disable minus button if quantity is 1
-            buttonMinus.setEnabled(cartItem.getQuantity() > 1);
+                // Quantity buttons
+                if (buttonMinus != null) {
+                    buttonMinus.setOnClickListener(v -> {
+                        int newQuantity = cartItem.getQuantity() - 1;
+                        if (newQuantity >= 0) {
+                            if (listener != null) {
+                                listener.onQuantityChanged(cartItem, newQuantity);
+                            }
+                        }
+                    });
+                    buttonMinus.setEnabled(cartItem.getQuantity() > 1);
+                }
+
+                if (buttonPlus != null) {
+                    buttonPlus.setOnClickListener(v -> {
+                        int newQuantity = cartItem.getQuantity() + 1;
+                        if (listener != null) {
+                            listener.onQuantityChanged(cartItem, newQuantity);
+                        }
+                    });
+                }
+
+                // Remove button
+                if (buttonRemove != null) {
+                    buttonRemove.setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.onRemoveItem(cartItem);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

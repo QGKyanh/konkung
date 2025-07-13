@@ -6,6 +6,9 @@ import com.prm392.konkung.models.Product;
 import com.prm392.konkung.network.responses.BaseResponse;
 import com.prm392.konkung.network.responses.BlogListData;
 import com.prm392.konkung.network.responses.ProductListData;
+import com.prm392.konkung.repository.AuthRepository.SignUpRequest;
+import com.prm392.konkung.models.User;
+import com.prm392.konkung.repository.AuthRepository.LoginRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -69,4 +72,10 @@ public interface ApiService {
     
     @PUT("api/orders/{id}/cancel")
     Call<BaseResponse<Order>> cancelOrder(@Path("id") String orderId);
+
+    @POST("/api/authentication/sign-up")
+    Call<BaseResponse<User>> signUp(@Body SignUpRequest request);
+
+    @POST("/api/authentication/login")
+    Call<BaseResponse<User>> loginDashboard(@Body LoginRequest request);
 }

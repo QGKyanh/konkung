@@ -21,6 +21,7 @@ import com.prm392.konkung.utils.CartManager;
 import com.prm392.konkung.screens.checkout.CheckoutFragment;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,121 +51,225 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initViews(view);
-        initCartManager();
-        setupRecyclerView();
-        loadCartItems();
+        try {
+            initViews(view);
+            initCartManager();
+            setupRecyclerView();
+            loadCartItems();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Lỗi khởi tạo giỏ hàng", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void initViews(View view) {
-        recyclerViewCart = view.findViewById(R.id.recyclerViewCart);
-        textViewTotalPrice = view.findViewById(R.id.textViewTotalPrice);
-        textViewTotalSavings = view.findViewById(R.id.textViewTotalSavings);
-        textViewEmptyCart = view.findViewById(R.id.textViewEmptyCart);
-        textViewCartCount = view.findViewById(R.id.textViewCartCount);
-        buttonCheckout = view.findViewById(R.id.buttonCheckout);
-        contentView = view.findViewById(R.id.contentView);
+        try {
+            recyclerViewCart = view.findViewById(R.id.recyclerViewCart);
+            textViewTotalPrice = view.findViewById(R.id.textViewTotalPrice);
+            textViewTotalSavings = view.findViewById(R.id.textViewTotalSavings);
+            textViewEmptyCart = view.findViewById(R.id.textViewEmptyCart);
+            textViewCartCount = view.findViewById(R.id.textViewCartCount);
+            buttonCheckout = view.findViewById(R.id.buttonCheckout);
+            contentView = view.findViewById(R.id.contentView);
 
-        currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+            currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
-        buttonCheckout.setOnClickListener(v -> proceedToCheckout());
+            buttonCheckout.setOnClickListener(v -> proceedToCheckout());
 
-        // Setup back button
-        view.findViewById(R.id.buttonBack).setOnClickListener(v -> {
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
-            }
-        });
+            // Setup back button
+            view.findViewById(R.id.buttonBack).setOnClickListener(v -> {
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    getParentFragmentManager().popBackStack();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void initCartManager() {
-        cartManager = CartManager.getInstance(requireContext());
+        try {
+            cartManager = CartManager.getInstance(requireContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+            cartManager = null;
+        }
     }
 
     private void setupRecyclerView() {
-        cartAdapter = new CartAdapter(this);
-        recyclerViewCart.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerViewCart.setAdapter(cartAdapter);
+        try {
+            cartAdapter = new CartAdapter(this);
+            recyclerViewCart.setLayoutManager(new LinearLayoutManager(getContext()));
+            recyclerViewCart.setAdapter(cartAdapter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadCartItems() {
-        cartItems = cartManager.getCartItems();
-        updateUI();
+        try {
+            if (cartManager != null) {
+                cartItems = cartManager.getCartItems();
+            } else {
+                cartItems = new ArrayList<>();
+            }
+            updateUI();
+        } catch (Exception e) {
+            e.printStackTrace();
+            cartItems = new ArrayList<>();
+            updateUI();
+        }
     }
 
     private void updateUI() {
-        if (cartItems.isEmpty()) {
+        try {
+            if (cartItems == null || cartItems.isEmpty()) {
+                showEmptyCart();
+            } else {
+                showCartContent();
+                if (cartAdapter != null) {
+                    cartAdapter.updateCartItems(cartItems);
+                }
+                updateTotalPrice();
+                updateCartCount();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             showEmptyCart();
-        } else {
-            showCartContent();
-            cartAdapter.updateCartItems(cartItems);
-            updateTotalPrice();
-            updateCartCount();
         }
     }
 
     private void showEmptyCart() {
-        textViewEmptyCart.setVisibility(View.VISIBLE);
-        contentView.setVisibility(View.GONE);
+        try {
+            if (textViewEmptyCart != null) {
+                textViewEmptyCart.setVisibility(View.VISIBLE);
+            }
+            if (contentView != null) {
+                contentView.setVisibility(View.GONE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void showCartContent() {
-        textViewEmptyCart.setVisibility(View.GONE);
-        contentView.setVisibility(View.VISIBLE);
+        try {
+            if (textViewEmptyCart != null) {
+                textViewEmptyCart.setVisibility(View.GONE);
+            }
+            if (contentView != null) {
+                contentView.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateTotalPrice() {
-        double totalPrice = cartManager.getTotalPrice();
-        double totalSavings = cartManager.getTotalSavings();
+        try {
+            if (cartManager != null && textViewTotalPrice != null) {
+                double totalPrice = cartManager.getTotalPrice();
+                double totalSavings = cartManager.getTotalSavings();
 
-        textViewTotalPrice.setText(currencyFormat.format(totalPrice));
+                textViewTotalPrice.setText(currencyFormat.format(totalPrice));
 
-        if (totalSavings > 0) {
-            textViewTotalSavings.setVisibility(View.VISIBLE);
-            textViewTotalSavings.setText("Tiết kiệm: " + currencyFormat.format(totalSavings));
-        } else {
-            textViewTotalSavings.setVisibility(View.GONE);
+                if (textViewTotalSavings != null) {
+                    if (totalSavings > 0) {
+                        textViewTotalSavings.setVisibility(View.VISIBLE);
+                        textViewTotalSavings.setText("Tiết kiệm: " + currencyFormat.format(totalSavings));
+                    } else {
+                        textViewTotalSavings.setVisibility(View.GONE);
+                    }
+                }
+
+                if (buttonCheckout != null) {
+                    buttonCheckout.setEnabled(totalPrice > 0);
+                }
+            } else {
+                if (textViewTotalPrice != null) {
+                    textViewTotalPrice.setText(currencyFormat.format(0));
+                }
+                if (textViewTotalSavings != null) {
+                    textViewTotalSavings.setVisibility(View.GONE);
+                }
+                if (buttonCheckout != null) {
+                    buttonCheckout.setEnabled(false);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        buttonCheckout.setEnabled(totalPrice > 0);
     }
 
     private void updateCartCount() {
-        int itemCount = cartManager.getCartItemCount();
-        textViewCartCount.setText(itemCount + " sản phẩm");
+        try {
+            if (textViewCartCount != null) {
+                if (cartManager != null) {
+                    int itemCount = cartManager.getCartItemCount();
+                    textViewCartCount.setText(itemCount + " sản phẩm");
+                } else {
+                    textViewCartCount.setText("0 sản phẩm");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void proceedToCheckout() {
-        if (cartItems.isEmpty()) {
-            Toast.makeText(getContext(), "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        try {
+            if (cartItems == null || cartItems.isEmpty()) {
+                Toast.makeText(getContext(), "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        // Navigate to checkout screen
-        CheckoutFragment checkoutFragment = new CheckoutFragment();
-        getParentFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, checkoutFragment)
-                .addToBackStack(null)
-                .commit();
+            // Navigate to checkout screen
+            CheckoutFragment checkoutFragment = new CheckoutFragment();
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, checkoutFragment)
+                    .addToBackStack(null)
+                    .commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Lỗi chuyển đến thanh toán", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onQuantityChanged(CartItem cartItem, int newQuantity) {
-        cartManager.updateQuantity(cartItem.getProduct().getId(), newQuantity);
-        loadCartItems();
+        try {
+            if (cartManager != null) {
+                cartManager.updateQuantity(cartItem.getProduct().getId(), newQuantity);
+                loadCartItems();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Lỗi cập nhật số lượng", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onRemoveItem(CartItem cartItem) {
-        cartManager.removeFromCart(cartItem.getProduct().getId());
-        loadCartItems();
-        Toast.makeText(getContext(), "Đã xóa sản phẩm khỏi giỏ hàng", Toast.LENGTH_SHORT).show();
+        try {
+            if (cartManager != null) {
+                cartManager.removeFromCart(cartItem.getProduct().getId());
+                loadCartItems();
+                Toast.makeText(getContext(), "Đã xóa sản phẩm khỏi giỏ hàng", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Lỗi xóa sản phẩm", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadCartItems();
+        try {
+            loadCartItems();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
