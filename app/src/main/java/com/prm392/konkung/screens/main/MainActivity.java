@@ -12,6 +12,7 @@ import com.prm392.konkung.screens.home.HomeFragment;
 import com.prm392.konkung.screens.profile.ProfileFragment;
 import com.prm392.konkung.screens.products.ProductListFragment;
 import com.prm392.konkung.screens.blogs.BlogListFragment;
+import com.prm392.konkung.screens.cart.CartFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,11 +25,11 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
         setupBottomNavigation();
-        
+
         // Load default fragment
         if (savedInstanceState == null) {
-            loadFragment(new ProductListFragment());
-            bottomNavigationView.setSelectedItemId(R.id.nav_shop);
+            loadFragment(new HomeFragment());
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
     }
 
@@ -39,12 +40,14 @@ public class MainActivity extends AppCompatActivity {
     private void setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
-            
+
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
             } else if (itemId == R.id.nav_shop) {
                 selectedFragment = new ProductListFragment();
+            } else if (itemId == R.id.nav_cart) {
+                selectedFragment = new CartFragment();
             } else if (itemId == R.id.nav_blog) {
                 selectedFragment = new BlogListFragment();
             } else if (itemId == R.id.nav_chat) {
@@ -62,11 +65,19 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .commit();
-            return true;
+            try {
+                System.out.println("Loading fragment: " + fragment.getClass().getSimpleName());
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .commit();
+                System.out.println("Fragment loaded successfully");
+                return true;
+            } catch (Exception e) {
+                System.out.println("Error loading fragment: " + e.getMessage());
+                e.printStackTrace();
+                return false;
+            }
         }
         return false;
     }
