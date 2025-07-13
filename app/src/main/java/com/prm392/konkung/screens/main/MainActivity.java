@@ -9,10 +9,13 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.prm392.konkung.R;
 import com.prm392.konkung.screens.home.HomeFragment;
-import com.prm392.konkung.screens.profile.ProfileFragment;
+import com.prm392.konkung.screens.map.MapFragment;
 import com.prm392.konkung.screens.products.ProductListFragment;
 import com.prm392.konkung.screens.cart.CartFragment;
 import com.prm392.konkung.screens.login.LoginActivity;
+import com.prm392.konkung.screens.blogs.BlogListFragment;
+import com.prm392.konkung.screens.chat.ChatFragment;
+import com.prm392.konkung.screens.profile.ProfileFragment;
 import com.prm392.konkung.utils.AuthManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -56,12 +59,12 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new HomeFragment();
             } else if (itemId == R.id.nav_shop) {
                 selectedFragment = new ProductListFragment();
+            } else if (itemId == R.id.nav_map) {
+                selectedFragment = new MapFragment();
             } else if (itemId == R.id.nav_cart) {
                 selectedFragment = new CartFragment();
             } else if (itemId == R.id.nav_more) {
                 selectedFragment = new MoreFragment();
-            } else if (itemId == R.id.nav_profile) {
-                selectedFragment = new ProfileFragment();
             }
 
             if (selectedFragment != null) {

@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.prm392.konkung.R;
 import com.prm392.konkung.screens.blogs.BlogListFragment;
 import com.prm392.konkung.screens.chat.ChatFragment;
+import com.prm392.konkung.screens.profile.ProfileFragment;
 
 public class MoreFragment extends Fragment {
 
@@ -51,6 +52,18 @@ public class MoreFragment extends Fragment {
             getParentFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, chatFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        // Profile option
+        LinearLayout profileOption = view.findViewById(R.id.optionProfile);
+        profileOption.setOnClickListener(v -> {
+            // Navigate to ProfileFragment
+            ProfileFragment profileFragment = new ProfileFragment();
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, profileFragment)
                     .addToBackStack(null)
                     .commit();
         });
