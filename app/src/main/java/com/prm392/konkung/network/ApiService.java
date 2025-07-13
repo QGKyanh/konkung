@@ -9,14 +9,24 @@ import com.prm392.konkung.network.responses.ProductListData;
 import com.prm392.konkung.repository.AuthRepository.SignUpRequest;
 import com.prm392.konkung.models.User;
 import com.prm392.konkung.repository.AuthRepository.LoginRequest;
+import com.prm392.konkung.models.CartResponse;
+import com.prm392.konkung.models.AddToCartRequest;
+import com.prm392.konkung.models.UpdateCartItemRequest;
+import com.prm392.konkung.models.CheckoutRequest;
+import com.prm392.konkung.models.CheckoutResponse;
+import com.prm392.konkung.models.Address;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.PUT;
 
 public interface ApiService {
     
@@ -78,4 +88,25 @@ public interface ApiService {
 
     @POST("/api/authentication/login")
     Call<BaseResponse<User>> loginDashboard(@Body LoginRequest request);
+
+    @GET("api/user/{userId}/cart")
+    Call<BaseResponse<CartResponse>> getCart(@Path("userId") String userId);
+
+    @POST("api/user/{userId}/cart")
+    Call<BaseResponse<CartResponse>> addToCart(@Path("userId") String userId, @Body AddToCartRequest request);
+
+    @PATCH("api/user/{userId}/cart/{productId}")
+    Call<BaseResponse<CartResponse>> updateCartItem(@Path("userId") String userId, @Path("productId") String productId, @Body UpdateCartItemRequest request);
+
+    @DELETE("api/user/{userId}/cart")
+    Call<BaseResponse<Void>> deleteAllCart(@Path("userId") String userId);
+
+    @DELETE("api/user/{userId}/cart/{productId}")
+    Call<BaseResponse<CartResponse>> deleteCartItem(@Path("userId") String userId, @Path("productId") String productId);
+
+    @POST("api/checkout")
+    Call<BaseResponse<CheckoutResponse>> checkout(@Body CheckoutRequest request);
+
+    @GET("api/users/{userId}/addresses")
+    Call<BaseResponse<List<Address>>> getUserAddresses(@Path("userId") String userId);
 }

@@ -10,18 +10,35 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
+import android.content.Intent;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 
 import com.prm392.konkung.R;
 import com.prm392.konkung.models.CartItem;
+import com.prm392.konkung.models.CartItems;
 import com.prm392.konkung.models.Order;
 import com.prm392.konkung.repository.OrderRepository;
-import com.prm392.konkung.utils.CartManager;
+import com.prm392.konkung.network.ApiClient;
+import com.prm392.konkung.network.ApiService;
+import com.prm392.konkung.network.responses.BaseResponse;
+import com.prm392.konkung.models.CartResponse;
+import com.prm392.konkung.utils.AuthManager;
+// CartManager import removed - using server APIs instead
+import com.prm392.konkung.models.CheckoutRequest;
+import com.prm392.konkung.models.CheckoutResponse;
+import androidx.appcompat.app.AlertDialog;
+import com.prm392.konkung.models.Address;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,17 +53,18 @@ public class CheckoutFragment extends Fragment {
     private EditText editTextPhone;
     private EditText editTextAddress;
     private EditText editTextNote;
-    private RadioGroup radioGroupPaymentMethod;
-    private RadioButton radioButtonCash;
-    private RadioButton radioButtonBank;
     private Button buttonPlaceOrder;
+    private RecyclerView recyclerViewCheckoutProducts;
+    private CheckoutProductAdapter checkoutProductAdapter;
 
     // Data
-    private CartManager cartManager;
     private OrderRepository orderRepository;
     private NumberFormat currencyFormat;
     private List<CartItem> cartItems;
     private double shippingFee = 15000; // 15,000 VND shipping fee
+    private ApiService apiService;
+    private List<Address> addressList = new ArrayList<>();
+    private int selectedAddressId = 1; // default hardcode
 
     @Nullable
     @Override
@@ -74,30 +92,137 @@ public class CheckoutFragment extends Fragment {
         editTextPhone = view.findViewById(R.id.editTextPhone);
         editTextAddress = view.findViewById(R.id.editTextAddress);
         editTextNote = view.findViewById(R.id.editTextNote);
-        radioGroupPaymentMethod = view.findViewById(R.id.radioGroupPaymentMethod);
-        radioButtonCash = view.findViewById(R.id.radioButtonCash);
-        radioButtonBank = view.findViewById(R.id.radioButtonBank);
         buttonPlaceOrder = view.findViewById(R.id.buttonPlaceOrder);
+        recyclerViewCheckoutProducts = view.findViewById(R.id.recyclerViewCheckoutProducts);
+        checkoutProductAdapter = new CheckoutProductAdapter();
+        recyclerViewCheckoutProducts.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewCheckoutProducts.setAdapter(checkoutProductAdapter);
 
         currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+
+        // Không cho nhập tay vào ô địa chỉ, chỉ cho chọn
+        editTextAddress.setFocusable(false);
+        editTextAddress.setClickable(true);
+        editTextAddress.setOnClickListener(v -> {
+            if (addressList != null && !addressList.isEmpty()) {
+                showAddressSelectionDialog();
+            }
+        });
     }
 
     private void initData() {
-        cartManager = CartManager.getInstance(requireContext());
         orderRepository = OrderRepository.getInstance();
-        cartItems = cartManager.getCartItems();
+        apiService = ApiClient.getApiService();
+        loadCartFromServer();
+        loadAddresses();
     }
 
     private void setupListeners() {
         buttonPlaceOrder.setOnClickListener(v -> placeOrder());
+    }
 
-        // Set default payment method
-        radioButtonCash.setChecked(true);
+    private void loadCartFromServer() {
+        String userId = AuthManager.getInstance().getUserId();
+        if (userId == null || apiService == null) {
+            Toast.makeText(getContext(), "Lỗi: Không thể tải giỏ hàng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        apiService.getCart(userId).enqueue(new retrofit2.Callback<BaseResponse<CartResponse>>() {
+            @Override
+            public void onResponse(retrofit2.Call<BaseResponse<CartResponse>> call, retrofit2.Response<BaseResponse<CartResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    CartItems cartItemsData = response.body().getData().getCartItems();
+                    if (cartItemsData != null) {
+                        cartItems = cartItemsData.getItems();
+                    } else {
+                        cartItems = new ArrayList<>();
+                    }
+                    updateOrderSummary();
+                } else {
+                    Toast.makeText(getContext(), "Lỗi tải giỏ hàng", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<BaseResponse<CartResponse>> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadAddresses() {
+        String userId = AuthManager.getInstance().getUserId();
+        apiService.getUserAddresses(userId).enqueue(new retrofit2.Callback<BaseResponse<List<Address>>>() {
+            @Override
+            public void onResponse(retrofit2.Call<BaseResponse<List<Address>>> call, retrofit2.Response<BaseResponse<List<Address>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
+                    addressList = response.body().getData();
+                    Address defaultAddress = addressList.get(0); // hoặc tìm address có isDefault = true nếu muốn
+                    selectedAddressId = defaultAddress.getId();
+                    String addressStr = defaultAddress.getAddress() + ", " +
+                        defaultAddress.getWardName() + ", " +
+                        defaultAddress.getDistrictName() + ", " +
+                        defaultAddress.getProvinceName();
+                    editTextAddress.setText(addressStr);
+                    showAddressSelectionDialog();
+                } else {
+                    selectedAddressId = 1;
+                    editTextAddress.setText("");
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<BaseResponse<List<Address>>> call, Throwable t) {
+                selectedAddressId = 1;
+                editTextAddress.setText("");
+            }
+        });
+    }
+
+    private void showAddressSelectionDialog() {
+        if (addressList == null || addressList.isEmpty()) return;
+        String[] addressStrings = new String[addressList.size()];
+        for (int i = 0; i < addressList.size(); i++) {
+            Address addr = addressList.get(i);
+            addressStrings[i] = addr.getReceiverName() + " - " + addr.getAddress() + ", " + addr.getWardName() + ", " + addr.getDistrictName() + ", " + addr.getProvinceName();
+        }
+        new AlertDialog.Builder(requireContext())
+            .setTitle("Chọn địa chỉ giao hàng")
+            .setSingleChoiceItems(addressStrings, 0, (dialog, which) -> {
+                selectedAddressId = addressList.get(which).getId();
+                Address chosen = addressList.get(which);
+                String addressStr = chosen.getAddress() + ", " +
+                        chosen.getWardName() + ", " +
+                        chosen.getDistrictName() + ", " +
+                        chosen.getProvinceName();
+                editTextAddress.setText(addressStr);
+            })
+            .setPositiveButton("OK", null)
+            .show();
     }
 
     private void updateOrderSummary() {
-        double subtotal = cartManager.getTotalPrice();
-        double savings = cartManager.getTotalSavings();
+        if (cartItems == null || cartItems.isEmpty()) {
+            checkoutProductAdapter.updateProducts(new ArrayList<>());
+            textViewSubtotal.setText(currencyFormat.format(0));
+            textViewShippingFee.setText(currencyFormat.format(shippingFee));
+            textViewTotal.setText(currencyFormat.format(shippingFee));
+            textViewSavings.setVisibility(View.GONE);
+            return;
+        }
+        checkoutProductAdapter.updateProducts(cartItems);
+
+        double subtotal = 0;
+        double savings = 0;
+
+        for (CartItem item : cartItems) {
+            subtotal += item.getTotalPrice();
+            // Calculate savings (original price - sale price) * quantity
+            if (item.getSalePrice() > 0 && item.getSalePrice() < item.getOriginalPrice()) {
+                savings += (item.getOriginalPrice() - item.getSalePrice()) * item.getQuantity();
+            }
+        }
+
         double total = subtotal + shippingFee;
 
         textViewSubtotal.setText(currencyFormat.format(subtotal));
@@ -112,64 +237,70 @@ public class CheckoutFragment extends Fragment {
         }
     }
 
+    private void clearCartFromServer() {
+        String userId = AuthManager.getInstance().getUserId();
+        if (userId == null || apiService == null) return;
+
+        apiService.deleteAllCart(userId).enqueue(new retrofit2.Callback<BaseResponse<Void>>() {
+            @Override
+            public void onResponse(retrofit2.Call<BaseResponse<Void>> call, retrofit2.Response<BaseResponse<Void>> response) {
+                // Cart cleared successfully
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<BaseResponse<Void>> call, Throwable t) {
+                // Handle error silently
+            }
+        });
+    }
+
     private void placeOrder() {
         // Validate input
         if (!validateInput()) {
             return;
         }
-
         // Get form data
-        String fullName = editTextFullName.getText().toString().trim();
-        String phone = editTextPhone.getText().toString().trim();
-        String address = editTextAddress.getText().toString().trim();
         String note = editTextNote.getText().toString().trim();
-        String paymentMethod = radioButtonCash.isChecked() ? "CASH" : "BANK_TRANSFER";
+        String paymentMethod = "PAYOS";
+        boolean isUsingPoint = false; // Hardcode isUsingPoint = false
+        int addressId = selectedAddressId;
+        int shippingFeeInt = (int) shippingFee;
 
-        // Create order
-        Order order = new Order();
-        order.setCustomerName(fullName);
-        order.setCustomerPhone(phone);
-        order.setDeliveryAddress(address);
-        order.setNote(note);
-        order.setPaymentMethod(paymentMethod);
-        order.setSubtotal(cartManager.getTotalPrice());
-        order.setShippingFee(shippingFee);
-        order.setTotal(order.getSubtotal() + order.getShippingFee());
-        order.setSavings(cartManager.getTotalSavings());
-        order.setItems(cartItems);
+        // Tạo payload checkout
+        CheckoutRequest request = new CheckoutRequest(
+            shippingFeeInt,
+            addressId,
+            note,
+            paymentMethod,
+            isUsingPoint
+        );
 
-        // Show loading
         buttonPlaceOrder.setEnabled(false);
         buttonPlaceOrder.setText("Đang xử lý...");
 
-        // Submit order
-        orderRepository.createOrder(order, new OrderRepository.OrderCallback() {
+        apiService.checkout(request).enqueue(new retrofit2.Callback<BaseResponse<CheckoutResponse>>() {
             @Override
-            public void onSuccess(Order createdOrder) {
-                // Clear cart after successful order
-                cartManager.clearCart();
-
-                // Show success message
-                Toast.makeText(getContext(), "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
-
-                // Navigate to order confirmation
-                OrderConfirmationFragment confirmationFragment = OrderConfirmationFragment
-                        .newInstance(createdOrder.getId());
-                getParentFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, confirmationFragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                // Re-enable button
+            public void onResponse(retrofit2.Call<BaseResponse<CheckoutResponse>> call, retrofit2.Response<BaseResponse<CheckoutResponse>> response) {
                 buttonPlaceOrder.setEnabled(true);
-                buttonPlaceOrder.setText("Đặt hàng");
-
-                // Show error message
-                Toast.makeText(getContext(), "Lỗi: " + errorMessage, Toast.LENGTH_LONG).show();
+                buttonPlaceOrder.setText("Xác nhận thanh toán");
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    String payUrl = response.body().getData().getPayUrl();
+                    if (payUrl != null && !payUrl.isEmpty()) {
+                        // Mở PayOS
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(payUrl));
+                        startActivity(browserIntent);
+                    } else {
+                        Toast.makeText(getContext(), "Không nhận được link thanh toán", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Lỗi khi tạo đơn hàng", Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<BaseResponse<CheckoutResponse>> call, Throwable t) {
+                buttonPlaceOrder.setEnabled(true);
+                buttonPlaceOrder.setText("Xác nhận thanh toán");
+                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -205,5 +336,47 @@ public class CheckoutFragment extends Fragment {
         }
 
         return true;
+    }
+}
+
+// Adapter cho danh sách sản phẩm trong checkout
+class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProductAdapter.ViewHolder> {
+    private List<CartItem> products = new ArrayList<>();
+    public void updateProducts(List<CartItem> newProducts) {
+        this.products = newProducts != null ? newProducts : new ArrayList<>();
+        notifyDataSetChanged();
+    }
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_checkout_product, parent, false);
+        return new ViewHolder(view);
+    }
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        CartItem item = products.get(position);
+        holder.textProductName.setText(item.getProductName());
+        holder.textProductQuantity.setText("x" + item.getQuantity());
+        holder.textProductPrice.setText(NumberFormat.getCurrencyInstance(new Locale("vi", "VN")).format(item.getSalePrice() > 0 ? item.getSalePrice() : item.getOriginalPrice()));
+        Glide.with(holder.imageProduct.getContext())
+                .load(item.getThumbnail())
+                .placeholder(R.drawable.ic_milk_logo)
+                .error(R.drawable.ic_milk_logo)
+                .into(holder.imageProduct);
+    }
+    @Override
+    public int getItemCount() {
+        return products != null ? products.size() : 0;
+    }
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView imageProduct;
+        TextView textProductName, textProductQuantity, textProductPrice;
+        ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageProduct = itemView.findViewById(R.id.imageProduct);
+            textProductName = itemView.findViewById(R.id.textProductName);
+            textProductQuantity = itemView.findViewById(R.id.textProductQuantity);
+            textProductPrice = itemView.findViewById(R.id.textProductPrice);
+        }
     }
 }

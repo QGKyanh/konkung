@@ -29,7 +29,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     public interface OnCartItemClickListener {
         void onQuantityChanged(CartItem cartItem, int newQuantity);
-
         void onRemoveItem(CartItem cartItem);
     }
 
@@ -66,7 +65,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     class CartViewHolder extends RecyclerView.ViewHolder {
         private ImageView imageProduct;
         private TextView textProductName;
-        private TextView textProductBrand;
         private TextView textCurrentPrice;
         private TextView textOriginalPrice;
         private TextView textQuantity;
@@ -75,13 +73,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         private MaterialButton buttonMinus;
         private MaterialButton buttonPlus;
         private ImageView buttonRemove;
-        private View discountBadge;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
             imageProduct = itemView.findViewById(R.id.imageProduct);
             textProductName = itemView.findViewById(R.id.textProductName);
-            textProductBrand = itemView.findViewById(R.id.textProductBrand);
             textCurrentPrice = itemView.findViewById(R.id.textCurrentPrice);
             textOriginalPrice = itemView.findViewById(R.id.textOriginalPrice);
             textQuantity = itemView.findViewById(R.id.textQuantity);
@@ -90,8 +86,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             buttonMinus = itemView.findViewById(R.id.buttonMinus);
             buttonPlus = itemView.findViewById(R.id.buttonPlus);
             buttonRemove = itemView.findViewById(R.id.buttonRemove);
-            // discountBadge không tồn tại trong item_cart.xml, nên comment lại
-            // discountBadge = itemView.findViewById(R.id.discountBadge);
         }
 
         public void bind(CartItem cartItem) {
@@ -99,7 +93,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 // Product image
                 if (imageProduct != null) {
                     Glide.with(itemView.getContext())
-                            .load(cartItem.getProduct().getThumbnail())
+                            .load(cartItem.getThumbnail())
                             .transform(new RoundedCorners(12))
                             .placeholder(R.drawable.ic_milk_logo)
                             .error(R.drawable.ic_milk_logo)
@@ -108,31 +102,28 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
                 // Product info
                 if (textProductName != null) {
-                    textProductName.setText(cartItem.getProduct().getName());
-                }
-                if (textProductBrand != null) {
-                    textProductBrand.setText(cartItem.getProduct().getBrand());
+                    textProductName.setText(cartItem.getProductName());
                 }
 
                 // Price handling
-                if (cartItem.getProduct().isOnSale()) {
+                boolean onSale = cartItem.getSalePrice() > 0 && cartItem.getSalePrice() < cartItem.getOriginalPrice();
+                if (onSale) {
                     if (textCurrentPrice != null) {
-                        textCurrentPrice.setText(currencyFormat.format(cartItem.getProduct().getSalePrice()));
+                        textCurrentPrice.setText(currencyFormat.format(cartItem.getSalePrice()));
                     }
                     if (textOriginalPrice != null) {
-                        textOriginalPrice.setText(currencyFormat.format(cartItem.getProduct().getOriginalPrice()));
+                        textOriginalPrice.setText(currencyFormat.format(cartItem.getOriginalPrice()));
                         textOriginalPrice.setPaintFlags(textOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                         textOriginalPrice.setVisibility(View.VISIBLE);
                     }
-
                     if (textDiscountPercentage != null) {
-                        textDiscountPercentage
-                                .setText(String.format("-%d%%", (int) cartItem.getProduct().getDiscountPercentage()));
+                        int percent = (int) ((cartItem.getOriginalPrice() - cartItem.getSalePrice()) / cartItem.getOriginalPrice() * 100);
+                        textDiscountPercentage.setText("-" + percent + "%");
                         textDiscountPercentage.setVisibility(View.VISIBLE);
                     }
                 } else {
                     if (textCurrentPrice != null) {
-                        textCurrentPrice.setText(currencyFormat.format(cartItem.getProduct().getOriginalPrice()));
+                        textCurrentPrice.setText(currencyFormat.format(cartItem.getOriginalPrice()));
                     }
                     if (textOriginalPrice != null) {
                         textOriginalPrice.setVisibility(View.GONE);
@@ -156,7 +147,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 if (buttonMinus != null) {
                     buttonMinus.setOnClickListener(v -> {
                         int newQuantity = cartItem.getQuantity() - 1;
-                        if (newQuantity >= 0) {
+                        if (newQuantity >= 1) {
                             if (listener != null) {
                                 listener.onQuantityChanged(cartItem, newQuantity);
                             }
