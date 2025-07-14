@@ -140,55 +140,16 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Payment Method -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Đã xóa UI phương thức thanh toán, mặc định là PayOS -->
+
+        <!-- Product List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewCheckoutProducts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Phương thức thanh toán"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="16dp" />
-
-                <RadioGroup
-                    android:id="@+id/radioGroupPaymentMethod"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <RadioButton
-                        android:id="@+id/radioButtonCash"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Tiền mặt khi nhận hàng"
-                        android:textSize="16sp"
-                        android:padding="12dp" />
-
-                    <RadioButton
-                        android:id="@+id/radioButtonBank"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Chuyển khoản ngân hàng"
-                        android:textSize="16sp"
-                        android:padding="12dp" />
-
-                </RadioGroup>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_checkout_product" />
 
         <!-- Order Summary -->
         <com.google.android.material.card.MaterialCardView

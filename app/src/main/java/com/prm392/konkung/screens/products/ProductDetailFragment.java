@@ -19,8 +19,15 @@ import com.bumptech.glide.Glide;
 import com.prm392.konkung.R;
 import com.prm392.konkung.models.Product;
 import com.prm392.konkung.repository.ProductRepository;
-import com.prm392.konkung.utils.CartManager;
+// CartManager import removed - using server APIs instead
 import com.prm392.konkung.screens.checkout.CheckoutFragment;
+import com.prm392.konkung.network.ApiClient;
+import com.prm392.konkung.network.ApiService;
+import com.prm392.konkung.network.responses.BaseResponse;
+import com.prm392.konkung.models.AddToCartRequest;
+import com.prm392.konkung.models.CartResponse;
+import com.prm392.konkung.utils.AuthManager;
+import com.prm392.konkung.screens.main.MainActivity;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -57,7 +64,7 @@ public class ProductDetailFragment extends Fragment {
     private String productId;
     private Product currentProduct;
     private ProductRepository productRepository;
-    private CartManager cartManager;
+    private ApiService apiService;
     private NumberFormat currencyFormat;
     private SimpleDateFormat dateFormat;
 
@@ -133,7 +140,7 @@ public class ProductDetailFragment extends Fragment {
 
     private void initRepositories() {
         productRepository = ProductRepository.getInstance();
-        cartManager = CartManager.getInstance(requireContext());
+        apiService = ApiClient.getApiService();
     }
 
     private void loadProductDetail() {
@@ -236,6 +243,9 @@ public class ProductDetailFragment extends Fragment {
         } else {
             textViewDescription.setText("Không có mô tả sản phẩm");
         }
+        
+        // Cập nhật trạng thái button thêm vào giỏ hàng
+        updateAddToCartButton();
     }
 
     private void displayQuantityAndStatus() {
@@ -279,26 +289,63 @@ public class ProductDetailFragment extends Fragment {
 
     private void addToCart() {
         if (currentProduct != null) {
-            cartManager.addToCart(currentProduct);
-            String message = currentProduct.isPreOrder() ? 
-                    "Đã thêm vào giỏ hàng (đặt trước)" : 
-                    "Đã thêm vào giỏ hàng";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            String userId = AuthManager.getInstance().getUserId();
+            ApiService apiService = ApiClient.getApiService();
+            AddToCartRequest req = new AddToCartRequest(currentProduct.getId(), 1);
+            apiService.addToCart(userId, req).enqueue(new retrofit2.Callback<BaseResponse<CartResponse>>() {
+                @Override
+                public void onResponse(retrofit2.Call<BaseResponse<CartResponse>> call, retrofit2.Response<BaseResponse<CartResponse>> response) {
+                    if (response.isSuccessful()) {
+                        String message = currentProduct.isPreOrder() ? "Đã thêm vào giỏ hàng (đặt trước)" : "Đã thêm vào giỏ hàng";
+                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                        MainActivity.updateCartBadgeFromFragment(requireActivity());
+                        // Optionally: cập nhật UI/badge
+                    } else {
+                        Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(retrofit2.Call<BaseResponse<CartResponse>> call, Throwable t) {
+                    Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void updateAddToCartButton() {
+        if (currentProduct != null) {
+            // For now, just show the default text since we don't have cart info
+            // In a real implementation, you would fetch cart info from server
+            buttonAddToCart.setText("Thêm vào giỏ hàng");
         }
     }
 
     private void buyNow() {
         if (currentProduct != null) {
-            // Add to cart first
-            cartManager.addToCart(currentProduct);
-            
-            // Navigate to checkout screen
-            CheckoutFragment checkoutFragment = new CheckoutFragment();
-            getParentFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, checkoutFragment)
-                .addToBackStack(null)
-                .commit();
+            String userId = AuthManager.getInstance().getUserId();
+            ApiService apiService = ApiClient.getApiService();
+            AddToCartRequest req = new AddToCartRequest(currentProduct.getId(), 1);
+            apiService.addToCart(userId, req).enqueue(new retrofit2.Callback<BaseResponse<CartResponse>>() {
+                @Override
+                public void onResponse(retrofit2.Call<BaseResponse<CartResponse>> call, retrofit2.Response<BaseResponse<CartResponse>> response) {
+                    if (response.isSuccessful()) {
+                        // Navigate to checkout screen
+                        MainActivity.updateCartBadgeFromFragment(requireActivity());
+                        CheckoutFragment checkoutFragment = new CheckoutFragment();
+                        getParentFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, checkoutFragment)
+                            .addToBackStack(null)
+                            .commit();
+                    } else {
+                        Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(retrofit2.Call<BaseResponse<CartResponse>> call, Throwable t) {
+                    Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
