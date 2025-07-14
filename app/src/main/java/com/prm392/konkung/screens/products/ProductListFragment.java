@@ -22,7 +22,14 @@ import com.prm392.konkung.R;
 import com.prm392.konkung.adapters.ProductAdapter;
 import com.prm392.konkung.models.Product;
 import com.prm392.konkung.repository.ProductRepository;
-import com.prm392.konkung.utils.CartManager;
+// CartManager import removed - using server APIs instead
+import com.prm392.konkung.network.ApiClient;
+import com.prm392.konkung.network.ApiService;
+import com.prm392.konkung.network.responses.BaseResponse;
+import com.prm392.konkung.models.AddToCartRequest;
+import com.prm392.konkung.models.CartResponse;
+import com.prm392.konkung.utils.AuthManager;
+import com.prm392.konkung.screens.main.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +46,7 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
     private SwipeRefreshLayout swipeRefreshLayout;
     
     private ProductRepository productRepository;
-    private CartManager cartManager;
+    private ApiService apiService;
     
     private List<Product> allProducts = new ArrayList<>();
     private int currentPage = 1;
@@ -147,8 +154,15 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
     }
 
     private void initRepositories() {
-        productRepository = ProductRepository.getInstance();
-        cartManager = CartManager.getInstance(requireContext());
+        try {
+            productRepository = ProductRepository.getInstance();
+            apiService = ApiClient.getApiService();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Lỗi khởi tạo API service", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void loadProducts() {
@@ -277,14 +291,34 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
 
     @Override
     public void onAddToCartClick(Product product) {
-        if (product.isAvailable() || product.isPreOrder()) {
-            cartManager.addToCart(product);
-            String message = product.isPreOrder() ? 
-                    "Đã thêm vào giỏ hàng (đặt trước)" : 
-                    "Đã thêm vào giỏ hàng";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getContext(), "Sản phẩm không khả dụng", Toast.LENGTH_SHORT).show();
+        try {
+            if (product.isAvailable() || product.isPreOrder()) {
+                String userId = AuthManager.getInstance().getUserId();
+                ApiService apiService = ApiClient.getApiService();
+                AddToCartRequest req = new AddToCartRequest(product.getId(), 1);
+                apiService.addToCart(userId, req).enqueue(new retrofit2.Callback<BaseResponse<CartResponse>>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<BaseResponse<CartResponse>> call, retrofit2.Response<BaseResponse<CartResponse>> response) {
+                        if (response.isSuccessful()) {
+                            String message = product.isPreOrder() ? "Đã thêm vào giỏ hàng (đặt trước)" : "Đã thêm vào giỏ hàng";
+                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                            MainActivity.updateCartBadgeFromFragment(requireActivity());
+                            // Optionally: reload cart badge/main activity
+                        } else {
+                            Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onFailure(retrofit2.Call<BaseResponse<CartResponse>> call, Throwable t) {
+                        Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(getContext(), "Sản phẩm không khả dụng", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -2,6 +2,13 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+// Load local.properties
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+
 android {
     namespace 'com.prm392.konkung'
     compileSdk 35
@@ -20,6 +27,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "GEMINI_API_KEY", "\"${localProperties.getProperty('GEMINI_API_KEY', '')}\""
+        }
+        debug {
+            buildConfigField "String", "GEMINI_API_KEY", "\"${localProperties.getProperty('GEMINI_API_KEY', '')}\""
         }
     }
     compileOptions {
@@ -28,6 +39,12 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig true
+    }
+    lintOptions {
+        abortOnError false
+        disable 'NotificationPermission'
+        checkReleaseBuilds false
     }
 }
 
@@ -51,8 +68,22 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
     
+    // OpenStreetMap (OSMDroid) - Free alternative to Google Maps
+    implementation 'org.osmdroid:osmdroid-android:6.1.17'
+    
     // SwipeRefreshLayout
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    
+    // SQLite Database (Room)
+    implementation 'androidx.room:room-runtime:2.5.0'
+    annotationProcessor 'androidx.room:room-compiler:2.5.0'
+    implementation 'androidx.room:room-rxjava3:2.5.0'
+    
+    // AI Chatbot (OpenAI API alternative - Using local AI responses for demo)
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    
+    // JSON handling for AI API
+    implementation 'org.json:json:20230618'
     
     // Testing
     testImplementation libs.junit

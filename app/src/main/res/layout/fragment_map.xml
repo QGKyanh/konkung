@@ -24,76 +24,70 @@
             android:textColor="@color/text_primary" />
 
         <ImageView
+            android:id="@+id/buttonMyLocation"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_location"
-            android:contentDescription="My location" />
+            android:src="@drawable/ic_my_location"
+            android:contentDescription="My location"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/mapContainer"
+    <!-- OpenStreetMap (OSMDroid) Container - Minimized -->
+    <org.osmdroid.views.MapView
+        android:id="@+id/osmMap"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/map_background">
+        android:layout_weight="0.6" />
+
+    <!-- Store List Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.4"
+        android:orientation="vertical"
+        android:background="@android:color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="32dp">
-
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@drawable/ic_map"
-                android:layout_marginBottom="16dp"
-                android:contentDescription="Map" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:background="@color/primary">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Map Coming Soon!"
-                android:textSize="20sp"
+                android:layout_weight="1"
+                android:text="Nearby Stores"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="8dp" />
+                android:textColor="@android:color/white" />
 
             <TextView
+                android:id="@+id/textViewStoreCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Find nearby milk stores and delivery points"
+                android:text="7 stores"
                 android:textSize="14sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/primary"
+                android:background="@android:color/white"
+                android:padding="8dp"
+                android:minWidth="32dp"
                 android:gravity="center" />
 
         </LinearLayout>
 
-    </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:orientation="vertical"
-        android:background="@android:color/white"
-        android:padding="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nearby Stores"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_primary"
-            android:layout_marginBottom="12dp" />
-
+        <!-- Store List RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewStores"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:clipToPadding="false" />
 
     </LinearLayout>
 
