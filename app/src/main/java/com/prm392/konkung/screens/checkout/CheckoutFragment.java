@@ -13,6 +13,9 @@ import android.widget.Toast;
 import android.widget.ImageView;
 import android.content.Intent;
 import android.net.Uri;
+import android.app.ProgressDialog;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,6 +59,8 @@ public class CheckoutFragment extends Fragment {
     private Button buttonPlaceOrder;
     private RecyclerView recyclerViewCheckoutProducts;
     private CheckoutProductAdapter checkoutProductAdapter;
+    private WebView webViewPayment;
+    private Button buttonBackWebView;
 
     // Data
     private OrderRepository orderRepository;
@@ -65,6 +70,7 @@ public class CheckoutFragment extends Fragment {
     private ApiService apiService;
     private List<Address> addressList = new ArrayList<>();
     private int selectedAddressId = 1; // default hardcode
+    private ProgressDialog progressDialog;
 
     @Nullable
     @Override
@@ -81,6 +87,9 @@ public class CheckoutFragment extends Fragment {
         initData();
         setupListeners();
         updateOrderSummary();
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Đang xử lý thanh toán...");
+        progressDialog.setCancelable(false);
     }
 
     private void initViews(View view) {
@@ -97,17 +106,15 @@ public class CheckoutFragment extends Fragment {
         checkoutProductAdapter = new CheckoutProductAdapter();
         recyclerViewCheckoutProducts.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewCheckoutProducts.setAdapter(checkoutProductAdapter);
+        webViewPayment = view.findViewById(R.id.webViewPayment);
+        webViewPayment.getSettings().setJavaScriptEnabled(true);
+        webViewPayment.setWebViewClient(new WebViewClient());
+        buttonBackWebView = view.findViewById(R.id.buttonBackWebView);
+        buttonBackWebView.setOnClickListener(v -> handleBackWebView());
 
         currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
-        // Không cho nhập tay vào ô địa chỉ, chỉ cho chọn
-        editTextAddress.setFocusable(false);
-        editTextAddress.setClickable(true);
-        editTextAddress.setOnClickListener(v -> {
-            if (addressList != null && !addressList.isEmpty()) {
-                showAddressSelectionDialog();
-            }
-        });
+        // Cho phép nhập địa chỉ tự do, không setFocusable/Clickable/OnClickListener nữa
     }
 
     private void initData() {
@@ -254,41 +261,72 @@ public class CheckoutFragment extends Fragment {
         });
     }
 
+    private void showPaymentWebView(String url) {
+        webViewPayment.setVisibility(View.VISIBLE);
+        buttonBackWebView.setVisibility(View.VISIBLE);
+        // Ẩn nút đặt hàng, giữ nguyên các layout khác
+        buttonPlaceOrder.setVisibility(View.GONE);
+        // Chuyển các trường thông tin sang chỉ đọc
+        editTextFullName.setEnabled(false);
+        editTextPhone.setEnabled(false);
+        editTextAddress.setEnabled(false);
+        editTextNote.setEnabled(false);
+        recyclerViewCheckoutProducts.setEnabled(false);
+        webViewPayment.loadUrl(url);
+    }
+
+    private void hidePaymentWebView() {
+        webViewPayment.setVisibility(View.GONE);
+        buttonBackWebView.setVisibility(View.GONE);
+        buttonPlaceOrder.setVisibility(View.VISIBLE);
+        // Cho phép chỉnh sửa lại các trường thông tin
+        editTextFullName.setEnabled(true);
+        editTextPhone.setEnabled(true);
+        editTextAddress.setEnabled(true);
+        editTextNote.setEnabled(true);
+        recyclerViewCheckoutProducts.setEnabled(true);
+    }
+
+    private void handleBackWebView() {
+        // Khi bấm Quay lại, chuyển về Home và cập nhật badge cart
+        // 1. Đóng WebView
+        hidePaymentWebView();
+        // 2. Chuyển về Home bằng cách chọn tab nav_home trên BottomNavigationView
+        if (getActivity() instanceof com.prm392.konkung.screens.main.MainActivity) {
+            com.prm392.konkung.screens.main.MainActivity mainActivity = (com.prm392.konkung.screens.main.MainActivity) getActivity();
+            android.view.View bottomNav = mainActivity.findViewById(R.id.bottom_navigation);
+            if (bottomNav instanceof com.google.android.material.bottomnavigation.BottomNavigationView) {
+                ((com.google.android.material.bottomnavigation.BottomNavigationView) bottomNav).setSelectedItemId(R.id.nav_home);
+            }
+            // 3. Gọi lại cập nhật badge cart
+            com.prm392.konkung.screens.main.MainActivity.updateCartBadgeFromFragment(getActivity());
+        }
+    }
+
     private void placeOrder() {
-        // Validate input
         if (!validateInput()) {
             return;
         }
-        // Get form data
+        String address = editTextAddress.getText().toString().trim();
         String note = editTextNote.getText().toString().trim();
         String paymentMethod = "PAYOS";
-        boolean isUsingPoint = false; // Hardcode isUsingPoint = false
-        int addressId = selectedAddressId;
-        int shippingFeeInt = (int) shippingFee;
 
-        // Tạo payload checkout
-        CheckoutRequest request = new CheckoutRequest(
-            shippingFeeInt,
-            addressId,
-            note,
-            paymentMethod,
-            isUsingPoint
-        );
+        CheckoutRequest request = new CheckoutRequest(address, note, paymentMethod);
 
         buttonPlaceOrder.setEnabled(false);
         buttonPlaceOrder.setText("Đang xử lý...");
+        progressDialog.show();
 
         apiService.checkout(request).enqueue(new retrofit2.Callback<BaseResponse<CheckoutResponse>>() {
             @Override
             public void onResponse(retrofit2.Call<BaseResponse<CheckoutResponse>> call, retrofit2.Response<BaseResponse<CheckoutResponse>> response) {
                 buttonPlaceOrder.setEnabled(true);
-                buttonPlaceOrder.setText("Xác nhận thanh toán");
+                buttonPlaceOrder.setText("Đặt hàng");
+                progressDialog.dismiss();
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                    String payUrl = response.body().getData().getPayUrl();
-                    if (payUrl != null && !payUrl.isEmpty()) {
-                        // Mở PayOS
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(payUrl));
-                        startActivity(browserIntent);
+                    String checkoutUrl = response.body().getData().getCheckoutUrl();
+                    if (checkoutUrl != null && !checkoutUrl.isEmpty()) {
+                        showPaymentWebView(checkoutUrl);
                     } else {
                         Toast.makeText(getContext(), "Không nhận được link thanh toán", Toast.LENGTH_LONG).show();
                     }
@@ -299,7 +337,8 @@ public class CheckoutFragment extends Fragment {
             @Override
             public void onFailure(retrofit2.Call<BaseResponse<CheckoutResponse>> call, Throwable t) {
                 buttonPlaceOrder.setEnabled(true);
-                buttonPlaceOrder.setText("Xác nhận thanh toán");
+                buttonPlaceOrder.setText("Đặt hàng");
+                progressDialog.dismiss();
                 Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
