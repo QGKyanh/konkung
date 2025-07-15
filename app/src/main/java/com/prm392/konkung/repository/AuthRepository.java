@@ -84,7 +84,7 @@ public class AuthRepository {
                                 user.setEmail(userEmail);
                             }
                             
-                            callback.onSuccess(user, token);
+                        callback.onSuccess(user, token);
                         } else {
                             // Response không thành công nhưng có message
                             String errorMessage = baseResponse.getMessage();

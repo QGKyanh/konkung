@@ -18,13 +18,17 @@
             android:layout_marginBottom="24dp">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Welcome to Milk Store"
-                android:textSize="24sp"
+                android:text="Sữa Bột Kon Kung"
+                android:textSize="28sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_primary" />
+                android:textColor="@color/primary_color"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -34,15 +38,28 @@
 
         </LinearLayout>
 
-        <EditText
+        <!-- Ảnh cửa tiệm -->
+        <ImageView
+            android:id="@+id/imgStore"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Search for milk products..."
-            android:background="@drawable/edittext_background"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Store Image" />
+
+        <!-- Giới thiệu cửa tiệm -->
+        <TextView
+            android:id="@+id/tvStoreIntro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kon Kung là cửa hàng chuyên cung cấp các loại sữa bột chính hãng, uy tín, giá tốt cho mọi gia đình."
+            android:textSize="16sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
             android:padding="12dp"
-            android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="12dp"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="16dp" />
+
+        <!-- Đã xóa EditText search for products ở đây -->
 
         <TextView
             android:layout_width="wrap_content"

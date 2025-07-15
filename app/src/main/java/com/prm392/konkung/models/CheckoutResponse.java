@@ -1,8 +1,8 @@
 package com.prm392.konkung.models;
 
 public class CheckoutResponse {
-    private String payUrl;
+    private String checkoutUrl;
 
-    public String getPayUrl() { return payUrl; }
-    public void setPayUrl(String payUrl) { this.payUrl = payUrl; }
+    public String getCheckoutUrl() { return checkoutUrl; }
+    public void setCheckoutUrl(String checkoutUrl) { this.checkoutUrl = checkoutUrl; }
 } 

@@ -76,26 +76,26 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemClic
     }
 
     private void initViews(View view) {
-        recyclerViewCart = view.findViewById(R.id.recyclerViewCart);
-        textViewTotalPrice = view.findViewById(R.id.textViewTotalPrice);
-        textViewTotalSavings = view.findViewById(R.id.textViewTotalSavings);
-        textViewEmptyCart = view.findViewById(R.id.textViewEmptyCart);
-        textViewCartCount = view.findViewById(R.id.textViewCartCount);
-        buttonCheckout = view.findViewById(R.id.buttonCheckout);
-        contentView = view.findViewById(R.id.contentView);
-        currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-        buttonCheckout.setOnClickListener(v -> proceedToCheckout());
-        view.findViewById(R.id.buttonBack).setOnClickListener(v -> {
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
-            }
-        });
+            recyclerViewCart = view.findViewById(R.id.recyclerViewCart);
+            textViewTotalPrice = view.findViewById(R.id.textViewTotalPrice);
+            textViewTotalSavings = view.findViewById(R.id.textViewTotalSavings);
+            textViewEmptyCart = view.findViewById(R.id.textViewEmptyCart);
+            textViewCartCount = view.findViewById(R.id.textViewCartCount);
+            buttonCheckout = view.findViewById(R.id.buttonCheckout);
+            contentView = view.findViewById(R.id.contentView);
+            currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+            buttonCheckout.setOnClickListener(v -> proceedToCheckout());
+            view.findViewById(R.id.buttonBack).setOnClickListener(v -> {
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    getParentFragmentManager().popBackStack();
+                }
+            });
     }
 
     private void setupRecyclerView() {
-        cartAdapter = new CartAdapter(this);
-        recyclerViewCart.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerViewCart.setAdapter(cartAdapter);
+            cartAdapter = new CartAdapter(this);
+            recyclerViewCart.setLayoutManager(new LinearLayoutManager(getContext()));
+            recyclerViewCart.setAdapter(cartAdapter);
     }
 
     private void loadCartFromServer() {
@@ -110,25 +110,25 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemClic
                     totalSavings = cart.getVoucherDiscount() + cart.getPointDiscount();
                     totalQuantity = cart.getTotalQuantity();
                     updateUI();
-                } else {
+            } else {
                     showEmptyCart();
-                }
+            }
             }
             @Override
             public void onFailure(Call<BaseResponse<CartResponse>> call, Throwable t) {
                 showEmptyCart();
-            }
+        }
         });
     }
 
     private void updateUI() {
-        if (cartItems == null || cartItems.isEmpty()) {
-            showEmptyCart();
-        } else {
-            showCartContent();
-            cartAdapter.updateCartItems(cartItems);
-            updateTotalPrice();
-            updateCartCount();
+            if (cartItems == null || cartItems.isEmpty()) {
+                showEmptyCart();
+            } else {
+                showCartContent();
+                    cartAdapter.updateCartItems(cartItems);
+                updateTotalPrice();
+                updateCartCount();
         }
     }
 
@@ -147,34 +147,34 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemClic
 
     private void updateTotalPrice() {
         if (textViewTotalPrice != null) textViewTotalPrice.setText(currencyFormat.format(totalPrice));
-        if (textViewTotalSavings != null) {
-            if (totalSavings > 0) {
-                textViewTotalSavings.setVisibility(View.VISIBLE);
-                textViewTotalSavings.setText("Tiết kiệm: " + currencyFormat.format(totalSavings));
-            } else {
-                textViewTotalSavings.setVisibility(View.GONE);
-            }
-        }
+                if (textViewTotalSavings != null) {
+                    if (totalSavings > 0) {
+                        textViewTotalSavings.setVisibility(View.VISIBLE);
+                        textViewTotalSavings.setText("Tiết kiệm: " + currencyFormat.format(totalSavings));
+                    } else {
+                        textViewTotalSavings.setVisibility(View.GONE);
+                    }
+                }
         if (buttonCheckout != null) buttonCheckout.setEnabled(totalPrice > 0);
     }
 
     private void updateCartCount() {
-        if (textViewCartCount != null) {
+            if (textViewCartCount != null) {
             textViewCartCount.setText(totalQuantity + " sản phẩm");
         }
     }
 
     private void proceedToCheckout() {
-        if (cartItems == null || cartItems.isEmpty()) {
-            Toast.makeText(getContext(), "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        CheckoutFragment checkoutFragment = new CheckoutFragment();
-        getParentFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, checkoutFragment)
-                .addToBackStack(null)
-                .commit();
+            if (cartItems == null || cartItems.isEmpty()) {
+                Toast.makeText(getContext(), "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            CheckoutFragment checkoutFragment = new CheckoutFragment();
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, checkoutFragment)
+                    .addToBackStack(null)
+                    .commit();
     }
 
     @Override
@@ -188,8 +188,8 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemClic
                     }
                     @Override
                     public void onFailure(Call<BaseResponse<CartResponse>> call, Throwable t) {
-                        Toast.makeText(getContext(), "Lỗi cập nhật số lượng", Toast.LENGTH_SHORT).show();
-                    }
+            Toast.makeText(getContext(), "Lỗi cập nhật số lượng", Toast.LENGTH_SHORT).show();
+        }
                 });
     }
 
@@ -201,11 +201,11 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemClic
                     @Override
                     public void onResponse(Call<BaseResponse<CartResponse>> call, Response<BaseResponse<CartResponse>> response) {
                         loadCartFromServer();
-                    }
+            }
                     @Override
                     public void onFailure(Call<BaseResponse<CartResponse>> call, Throwable t) {
-                        Toast.makeText(getContext(), "Lỗi xóa sản phẩm", Toast.LENGTH_SHORT).show();
-                    }
+            Toast.makeText(getContext(), "Lỗi xóa sản phẩm", Toast.LENGTH_SHORT).show();
+        }
                 });
     }
 

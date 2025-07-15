@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Store Locations"
+            android:text="Vị trí cửa hàng"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary" />
@@ -62,7 +62,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Nearby Stores"
+                android:text="Cửa hàng gần đây"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white" />
@@ -71,7 +71,7 @@
                 android:id="@+id/textViewStoreCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="7 stores"
+                android:text="7 cửa hàng"
                 android:textSize="14sp"
                 android:textColor="@color/primary"
                 android:background="@android:color/white"
