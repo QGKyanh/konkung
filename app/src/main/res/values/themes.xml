@@ -17,4 +17,11 @@
         
         <item name="android:windowBackground">@color/background_light</item>
     </style>
+    
+    <!-- Toolbar Title Style -->
+    <style name="ToolbarTitle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/dark_gray</item>
+    </style>
 </resources>

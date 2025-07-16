@@ -25,6 +25,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import com.prm392.konkung.screens.login.LoginActivity;
 import com.prm392.konkung.utils.AuthManager;
+import com.prm392.konkung.screens.orders.OrderHistoryFragment;
 
 public class ProfileFragment extends Fragment {
 
@@ -49,6 +50,19 @@ public class ProfileFragment extends Fragment {
         TextView textViewEmail = view.findViewById(R.id.textViewEmail);
         TextView textViewPhone = view.findViewById(R.id.textViewPhone);
         Button buttonLogout = view.findViewById(R.id.buttonLogout);
+        
+        // Order History option
+        View optionOrderHistory = view.findViewById(R.id.optionOrderHistory);
+        optionOrderHistory.setOnClickListener(v -> {
+            // Navigate to Order History Fragment
+            String userId = AuthManager.getInstance(requireContext()).getUserId();
+            OrderHistoryFragment orderHistoryFragment = OrderHistoryFragment.newInstance(userId);
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, orderHistoryFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         // Gọi API lấy profile
         ApiService apiService = ApiClient.getApiService();
