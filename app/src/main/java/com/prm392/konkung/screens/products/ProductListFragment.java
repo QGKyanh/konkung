@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.prm392.konkung.models.AddToCartRequest;
 import com.prm392.konkung.models.CartResponse;
 import com.prm392.konkung.utils.AuthManager;
 import com.prm392.konkung.screens.main.MainActivity;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,8 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
     private ProgressBar progressBar;
     private TextView textViewEmpty;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private TextView textViewCategoryTitle;
+    private ImageView imageViewCategoryIcon;
     
     private ProductRepository productRepository;
     private ApiService apiService;
@@ -54,6 +58,10 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
     private boolean hasNextPage = true;
     private String currentSearchQuery = "";
     private Timer searchTimer;
+    private Integer categoryId = null;
+    private String categoryName = null;
+    // Thêm biến lưu danh sách category
+    private List<com.prm392.konkung.models.Category> categoryList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -64,8 +72,48 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
+        if (getArguments() != null) {
+            if (getArguments().containsKey("categoryId")) {
+                categoryId = getArguments().getInt("categoryId");
+            }
+            if (getArguments().containsKey("categoryName")) {
+                categoryName = getArguments().getString("categoryName");
+            }
+            if (getArguments().containsKey("categoryList")) {
+                categoryList = (List<com.prm392.konkung.models.Category>) getArguments().getSerializable("categoryList");
+            }
+        }
         initViews(view);
+        // Set category title
+        if (textViewCategoryTitle != null) {
+            if (categoryId == null) {
+                textViewCategoryTitle.setText("Tất cả sản phẩm");
+            } else if (categoryName != null && !categoryName.isEmpty()) {
+                textViewCategoryTitle.setText(categoryName);
+            } else {
+                textViewCategoryTitle.setText("Danh mục sản phẩm");
+            }
+        }
+        // Set category image
+        if (imageViewCategoryIcon != null) {
+            boolean loaded = false;
+            if (categoryId != null && categoryList != null) {
+                for (com.prm392.konkung.models.Category cat : categoryList) {
+                    if (cat.getId() == categoryId && cat.getDescription() != null && cat.getDescription().startsWith("http")) {
+                        Glide.with(this)
+                            .load(cat.getDescription())
+                            .placeholder(R.drawable.ic_milk_logo)
+                            .error(R.drawable.ic_milk_logo)
+                            .into(imageViewCategoryIcon);
+                        loaded = true;
+                        break;
+                    }
+                }
+            }
+            if (!loaded) {
+                imageViewCategoryIcon.setImageResource(R.drawable.ic_milk_logo);
+            }
+        }
         setupRecyclerView();
         setupSearch();
         setupSwipeRefresh();
@@ -79,6 +127,12 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
         progressBar = view.findViewById(R.id.progressBar);
         textViewEmpty = view.findViewById(R.id.textViewEmpty);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        textViewCategoryTitle = view.findViewById(R.id.textViewCategoryTitle);
+        imageViewCategoryIcon = view.findViewById(R.id.imageViewCategoryIcon);
+        // Nếu chưa có ic_category, dùng ic_milk_logo
+        if (imageViewCategoryIcon != null) {
+            imageViewCategoryIcon.setImageResource(R.drawable.ic_milk_logo);
+        }
     }
 
     private void setupRecyclerView() {
@@ -167,22 +221,40 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
 
     private void loadProducts() {
         System.out.println("Loading products...");
-        productRepository.getAllProducts(currentPage, 10, new ProductRepository.ProductListCallback() {
-            @Override
-            public void onSuccess(List<Product> products, boolean hasNextPage, int totalCount) {
-                handleProductsLoaded(products, hasNextPage);
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                handleError(errorMessage);
-            }
-
-            @Override
-            public void onLoading() {
-                handleLoading();
-            }
-        });
+        if (categoryId != null) {
+            // Gọi API lấy sản phẩm theo category
+            apiService.getProductsByCategory(String.valueOf(categoryId), currentPage, 20).enqueue(new retrofit2.Callback<BaseResponse<com.prm392.konkung.network.responses.ProductListData>>() {
+                @Override
+                public void onResponse(retrofit2.Call<BaseResponse<com.prm392.konkung.network.responses.ProductListData>> call, retrofit2.Response<BaseResponse<com.prm392.konkung.network.responses.ProductListData>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        List<Product> products = response.body().getData().getItems();
+                        boolean hasNext = response.body().getData().isHasNextPage();
+                        handleProductsLoaded(products, hasNext);
+                    } else {
+                        handleProductsLoaded(new ArrayList<>(), false);
+                    }
+                }
+                @Override
+                public void onFailure(retrofit2.Call<BaseResponse<com.prm392.konkung.network.responses.ProductListData>> call, Throwable t) {
+                    handleProductsLoaded(new ArrayList<>(), false);
+                }
+            });
+        } else {
+            productRepository.getAllProducts(currentPage, 10, new ProductRepository.ProductListCallback() {
+                @Override
+                public void onSuccess(List<Product> products, boolean hasNextPage, int totalCount) {
+                    handleProductsLoaded(products, hasNextPage);
+                }
+                @Override
+                public void onError(String errorMessage) {
+                    handleError(errorMessage);
+                }
+                @Override
+                public void onLoading() {
+                    handleLoading();
+                }
+            });
+        }
     }
 
     private void searchProducts(String query) {
@@ -261,7 +333,9 @@ public class ProductListFragment extends Fragment implements ProductAdapter.OnPr
         if (allProducts.isEmpty()) {
             textViewEmpty.setVisibility(View.VISIBLE);
             recyclerViewProducts.setVisibility(View.GONE);
-            if (currentSearchQuery.isEmpty()) {
+            if (categoryId != null) {
+                textViewEmpty.setText("Không có sản phẩm nào");
+            } else if (currentSearchQuery.isEmpty()) {
                 textViewEmpty.setText("Không có sản phẩm nào");
             } else {
                 textViewEmpty.setText("Không tìm thấy sản phẩm cho từ khóa: " + currentSearchQuery);

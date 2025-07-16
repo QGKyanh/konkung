@@ -6,6 +6,7 @@ import com.prm392.konkung.models.Product;
 import com.prm392.konkung.network.responses.BaseResponse;
 import com.prm392.konkung.network.responses.BlogListData;
 import com.prm392.konkung.network.responses.ProductListData;
+import com.prm392.konkung.network.responses.CategoryListData;
 import com.prm392.konkung.repository.AuthRepository.SignUpRequest;
 import com.prm392.konkung.models.User;
 import com.prm392.konkung.repository.AuthRepository.LoginRequest;
@@ -52,10 +53,16 @@ public interface ApiService {
     
     @GET("api/products")
     Call<BaseResponse<ProductListData>> getProductsByCategory(
-            @Query("categoryId") int categoryId,
+            @Query("CategoryIds") String categoryIds,
             @Query("page") int page,
             @Query("pageSize") int pageSize
     );
+
+    @GET("api/products/featured")
+    Call<BaseResponse<List<Product>>> getFeaturedProducts();
+
+    @GET("api/products/categories")
+    Call<BaseResponse<CategoryListData>> getAllCategories(@Query("PageSize") int pageSize);
     
     // Blog endpoints
     @GET("api/posts")

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light">
@@ -10,96 +11,94 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sữa Bột Kon Kung"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary_color"
-                android:gravity="center"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp" />
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_notification"
-                android:contentDescription="Notifications" />
-
-        </LinearLayout>
-
-        <!-- Ảnh cửa tiệm -->
+        <!-- 1. Banner quảng cáo (1 ảnh) -->
         <ImageView
-            android:id="@+id/imgStore"
+            android:id="@+id/imgBanner"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="180dp"
             android:scaleType="centerCrop"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="Store Image" />
+            android:src="@drawable/ic_milk_logo"
+            android:contentDescription="Banner" 
+            android:layout_marginBottom="16dp"/>
 
-        <!-- Giới thiệu cửa tiệm -->
+        <!-- 2. Chào mừng -->
         <TextView
-            android:id="@+id/tvStoreIntro"
+            android:id="@+id/tvWelcome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Kon Kung là cửa hàng chuyên cung cấp các loại sữa bột chính hãng, uy tín, giá tốt cho mọi gia đình."
-            android:textSize="16sp"
-            android:textColor="@color/text_secondary"
+            android:text="Chào mừng bạn đến với Kon Kung – Sữa bột chính hãng cho mọi gia đình!"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_color"
             android:gravity="center"
             android:padding="12dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="12dp" />
 
-        <!-- Đã xóa EditText search for products ở đây -->
-
+        <!-- 3. Danh mục sản phẩm -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Categories"
-            android:textSize="18sp"
+            android:text="Danh mục sản phẩm"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="8dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewCategories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="20dp"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
 
+        <!-- 4. Sản phẩm nổi bật -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Featured Products"
-            android:textSize="18sp"
+            android:text="Top 10 sản phẩm nổi bật"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="8dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewFeatured"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="20dp"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
 
+        <!-- 5. Tin tức/Bài viết hữu ích -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bài viết hữu ích"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewBlogs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
+
+        <!-- 6. Thông tin liên hệ & hỗ trợ -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/primary_color">
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:padding="16dp">
@@ -107,21 +106,21 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Special Offer!"
-                    android:textSize="20sp"
+                    android:text="Liên hệ &amp; Hỗ trợ"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@color/primary_color"
+                    android:layout_marginBottom="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Get 20% off on your first order"
+                    android:text="Hotline: 0123 456 789"
                     android:textSize="14sp"
-                    android:textColor="@android:color/white"
-                    android:gravity="center" />
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="8dp" />
 
             </LinearLayout>
-
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>
