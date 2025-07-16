@@ -41,7 +41,7 @@
             android:id="@+id/editTextUsername"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Email"
+            android:hint="Tên đăng nhập"
             android:inputType="textEmailAddress"
             android:background="@drawable/edittext_background"
             android:padding="16dp"

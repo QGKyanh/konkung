@@ -15,6 +15,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.prm392.konkung.R;
+import com.prm392.konkung.models.User;
+import com.prm392.konkung.network.ApiClient;
+import com.prm392.konkung.network.ApiService;
+import com.prm392.konkung.network.responses.BaseResponse;
+import com.bumptech.glide.Glide;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import com.prm392.konkung.screens.login.LoginActivity;
 import com.prm392.konkung.utils.AuthManager;
 
@@ -34,50 +42,51 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupViews(View view) {
-        AuthManager authManager = AuthManager.getInstance(requireContext());
-        
         // Initialize views
         ImageView imageViewAvatar = view.findViewById(R.id.imageViewAvatar);
-        TextView textViewName = view.findViewById(R.id.textViewName);
+        TextView textViewFullName = view.findViewById(R.id.textViewFullName);
+        TextView textViewUsername = view.findViewById(R.id.textViewUsername);
         TextView textViewEmail = view.findViewById(R.id.textViewEmail);
         TextView textViewPhone = view.findViewById(R.id.textViewPhone);
-        TextView textViewAddress = view.findViewById(R.id.textViewAddress);
-        Button buttonEditProfile = view.findViewById(R.id.buttonEditProfile);
-        Button buttonChangePassword = view.findViewById(R.id.buttonChangePassword);
         Button buttonLogout = view.findViewById(R.id.buttonLogout);
 
-        // Set user data
-        if (authManager.getCurrentUser() != null) {
-            textViewName.setText(authManager.getUserDisplayName());
-            textViewEmail.setText(authManager.getUserEmail());
-            
-            if (authManager.getCurrentUser().getPhone() != null && !authManager.getCurrentUser().getPhone().isEmpty()) {
-                textViewPhone.setText(authManager.getCurrentUser().getPhone());
-            } else {
-                textViewPhone.setText("Not provided");
+        // Gọi API lấy profile
+        ApiService apiService = ApiClient.getApiService();
+        apiService.getUserProfile().enqueue(new Callback<BaseResponse<User>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<User>> call, Response<BaseResponse<User>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    User user = response.body().getData();
+                    String fullName = (user.getFirstName() != null ? user.getFirstName() : "") +
+                            (user.getLastName() != null ? (" " + user.getLastName()) : "");
+                    textViewFullName.setText(fullName.trim());
+                    textViewUsername.setText("@" + (user.getUsername() != null ? user.getUsername() : ""));
+                    textViewEmail.setText(user.getEmail() != null ? user.getEmail() : "");
+                    textViewPhone.setText("Số điện thoại: " + (user.getPhoneNumber() != null ? user.getPhoneNumber() : ""));
+                    if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+                        Glide.with(requireContext())
+                            .load(user.getProfilePictureUrl())
+                            .placeholder(R.drawable.ic_profile_placeholder)
+                            .error(R.drawable.ic_profile_placeholder)
+                            .circleCrop()
+                            .into(imageViewAvatar);
+                    } else {
+                        imageViewAvatar.setImageResource(R.drawable.ic_profile_placeholder);
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Không lấy được thông tin tài khoản", Toast.LENGTH_SHORT).show();
+                }
             }
-            
-            if (authManager.getCurrentUser().getAddress() != null && !authManager.getCurrentUser().getAddress().isEmpty()) {
-                textViewAddress.setText(authManager.getCurrentUser().getAddress());
-            } else {
-                textViewAddress.setText("Not provided");
+            @Override
+            public void onFailure(Call<BaseResponse<User>> call, Throwable t) {
+                Toast.makeText(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        }
-
-        // Setup click listeners
-        buttonEditProfile.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Edit Profile coming soon!", Toast.LENGTH_SHORT).show();
-        });
-
-        buttonChangePassword.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Change Password coming soon!", Toast.LENGTH_SHORT).show();
         });
 
         buttonLogout.setOnClickListener(v -> {
-            authManager.logout();
-            Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
-            
-            Intent intent = new Intent(requireContext(), LoginActivity.class);
+            com.prm392.konkung.utils.AuthManager.getInstance(requireContext()).logout();
+            Toast.makeText(requireContext(), "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(requireContext(), com.prm392.konkung.screens.login.LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });

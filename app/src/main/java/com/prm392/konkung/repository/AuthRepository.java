@@ -185,6 +185,25 @@ public class AuthRepository {
             });
     }
 
+    public void sendActivationLink(String email, final AuthCallback callback) {
+        ApiService apiService = ApiClient.getApiService();
+        Call<com.prm392.konkung.network.responses.BaseResponse<Void>> call = apiService.activateAccount(email);
+        call.enqueue(new Callback<com.prm392.konkung.network.responses.BaseResponse<Void>>() {
+            @Override
+            public void onResponse(Call<com.prm392.konkung.network.responses.BaseResponse<Void>> call, Response<com.prm392.konkung.network.responses.BaseResponse<Void>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    callback.onSuccess(null, null);
+                } else {
+                    callback.onError(response.body() != null ? response.body().getMessage() : "Gửi link kích hoạt thất bại");
+                }
+            }
+            @Override
+            public void onFailure(Call<com.prm392.konkung.network.responses.BaseResponse<Void>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     // Thêm class SignUpRequest nếu chưa có
     public static class SignUpRequest {
         private String username;

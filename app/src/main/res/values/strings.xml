@@ -3,7 +3,7 @@
     
     <string name="login_title">Chào mừng trở lại</string>
     <string name="login_subtitle">Đăng nhập để tiếp tục</string>
-    <string name="email_hint">Email</string>
+    <string name="email_hint">Tên đăng nhập</string>
     <string name="password_hint">Mật khẩu</string>
     <string name="login_button">ĐĂNG NHẬP</string>
     <string name="forgot_password">Quên mật khẩu?</string>
