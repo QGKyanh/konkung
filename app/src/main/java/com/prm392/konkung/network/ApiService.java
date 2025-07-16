@@ -116,4 +116,10 @@ public interface ApiService {
 
     @GET("api/users/{userId}/addresses")
     Call<BaseResponse<List<Address>>> getUserAddresses(@Path("userId") String userId);
+
+    @GET("api/authentication/activate-account")
+    Call<BaseResponse<Void>> activateAccount(@Query("email") String email);
+
+    @GET("api/user/account/profile")
+    Call<BaseResponse<User>> getUserProfile();
 }
