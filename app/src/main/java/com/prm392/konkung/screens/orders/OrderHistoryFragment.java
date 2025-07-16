@@ -18,6 +18,7 @@ import com.prm392.konkung.R;
 import com.prm392.konkung.adapters.OrderHistoryAdapter;
 import com.prm392.konkung.models.OrderHistory;
 import com.prm392.konkung.repository.OrderHistoryRepository;
+import com.prm392.konkung.screens.orders.OrderDetailFragment;
 
 import java.util.List;
 
@@ -114,8 +115,12 @@ public class OrderHistoryFragment extends Fragment {
             @Override
             public void onOrderClick(OrderHistory order) {
                 // Navigate to order detail
-                // TODO: Create OrderDetailFragment
-                Toast.makeText(getContext(), "Chi tiết đơn hàng: " + order.getId(), Toast.LENGTH_SHORT).show();
+                OrderDetailFragment orderDetailFragment = OrderDetailFragment.newInstance(userId, order.getId());
+                getParentFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, orderDetailFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
 
             @Override

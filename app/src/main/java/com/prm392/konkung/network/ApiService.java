@@ -18,6 +18,7 @@ import com.prm392.konkung.models.UpdateCartItemRequest;
 import com.prm392.konkung.models.CheckoutRequest;
 import com.prm392.konkung.models.CheckoutResponse;
 import com.prm392.konkung.models.Address;
+import com.prm392.konkung.models.OrderDetailResponse;
 
 import java.util.List;
 
@@ -130,6 +131,12 @@ public interface ApiService {
             @Path("userId") String userId,
             @Query("page") int page,
             @Query("pageSize") int pageSize
+    );
+
+    @GET("api/users/{userId}/orders/{id}")
+    Call<BaseResponse<OrderDetailResponse>> getOrderDetail(
+            @Path("userId") String userId,
+            @Path("id") String orderId
     );
 
     @GET("api/order-history")
