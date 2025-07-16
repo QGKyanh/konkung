@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,13 +17,15 @@ import com.prm392.konkung.screens.main.MainActivity;
 import com.prm392.konkung.screens.register.RegisterActivity;
 import com.prm392.konkung.utils.AuthManager;
 import com.prm392.konkung.repository.AuthRepository;
+import com.bumptech.glide.Glide;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText editTextUsername, editTextPassword;
     private Button buttonLogin;
-    private TextView textViewRegister, textViewForgotPassword;
+    private TextView textViewRegister;
     private ProgressBar progressBar;
+    private ImageView imageViewLogo;
 
     private AuthRepository authRepository;
     private AuthManager authManager;
@@ -49,8 +52,16 @@ public class LoginActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
         textViewRegister = findViewById(R.id.textViewRegister);
-        textViewForgotPassword = findViewById(R.id.textViewForgotPassword);
         progressBar = findViewById(R.id.progressBar);
+        imageViewLogo = findViewById(R.id.imageViewLogo);
+        if (imageViewLogo != null) {
+            Glide.with(this)
+                .load("https://res.cloudinary.com/doqd4s5no/image/upload/v1752647278/dlpizjbkuiwdqerrwkig.png")
+                .placeholder(R.drawable.ic_milk_logo)
+                .error(R.drawable.ic_milk_logo)
+                .circleCrop()
+                .into(imageViewLogo);
+        }
     }
 
     private void setupClickListeners() {
@@ -66,10 +77,6 @@ public class LoginActivity extends AppCompatActivity {
         textViewRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
-        });
-
-        textViewForgotPassword.setOnClickListener(v -> {
-            showForgotPasswordDialog();
         });
     }
 
@@ -101,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     showLoading(false);
                     authManager.login(user, token);
-                    Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     navigateToMain();
                 });
             }
@@ -110,41 +117,6 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     showLoading(false);
                     Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                });
-            }
-        });
-    }
-
-    private void showForgotPasswordDialog() {
-        String email = editTextUsername.getText().toString().trim(); // Changed to username
-        
-        if (email.isEmpty()) {
-            Toast.makeText(this, "Please enter your username first", Toast.LENGTH_SHORT).show(); // Changed to username
-            return;
-        }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) { // This still uses email pattern, might need adjustment for username
-            Toast.makeText(this, "Please enter a valid username", Toast.LENGTH_SHORT).show(); // Changed to username
-            return;
-        }
-
-        showLoading(true);
-        authRepository.forgotPassword(email, new AuthRepository.AuthCallback() {
-            @Override
-            public void onSuccess(com.prm392.konkung.models.User user, String token) {
-                runOnUiThread(() -> {
-                    showLoading(false);
-                    Toast.makeText(LoginActivity.this, 
-                            "Password reset instructions sent to your email", Toast.LENGTH_LONG).show();
-                });
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                runOnUiThread(() -> {
-                    showLoading(false);
-                    Toast.makeText(LoginActivity.this, 
-                            "Failed to send reset email: " + errorMessage, Toast.LENGTH_LONG).show();
                 });
             }
         });

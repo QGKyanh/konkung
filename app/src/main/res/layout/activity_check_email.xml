@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/background_light"
+    android:padding="32dp">
+
+    <ImageView
+        android:id="@+id/imageViewEmail"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_email"
+        android:tint="@color/primary_color"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="Email Icon" />
+
+    <TextView
+        android:id="@+id/textViewCheckEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hãy kiểm tra hòm thư của bạn để kích hoạt tài khoản"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/primary_color"
+        android:gravity="center"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/buttonBackToLogin"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Quay lại đăng nhập"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="@drawable/button_primary"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/primary_color"
+        android:gravity="center"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp" />
+
+</LinearLayout> 

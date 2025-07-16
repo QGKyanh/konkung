@@ -1,14 +1,14 @@
 <resources>
-    <string name="app_name">Milk Store</string>
+    <string name="app_name">Kon Kung</string>
     
-    <string name="login_title">Welcome Back</string>
-    <string name="login_subtitle">Sign in to continue</string>
-    <string name="email_hint">Email</string>
-    <string name="password_hint">Password</string>
-    <string name="login_button">LOGIN</string>
-    <string name="forgot_password">Forgot Password?</string>
-    <string name="register_prompt">Don\'t have an account?</string>
-    <string name="register_link">Sign Up</string>
+    <string name="login_title">Chào mừng trở lại</string>
+    <string name="login_subtitle">Đăng nhập để tiếp tục</string>
+    <string name="email_hint">Tên đăng nhập</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="login_button">ĐĂNG NHẬP</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="register_prompt">Chưa có tài khoản?</string>
+    <string name="register_link">Đăng ký</string>
     
     <string name="nav_home">Home</string>
     <string name="nav_shop">Shop</string>
@@ -16,7 +16,7 @@
     <string name="nav_map">Map</string>
     <string name="nav_profile">Profile</string>
     
-    <string name="welcome_message">Welcome to Milk Store</string>
+    <string name="welcome_message">Chào mừng bạn đến với Kon Kung</string>
     <string name="search_hint">Search for milk products...</string>
     <string name="categories_title">Categories</string>
     <string name="featured_products_title">Featured Products</string>
@@ -55,4 +55,5 @@
     <string name="loading">Loading...</string>
     <string name="error">Error</string>
     <string name="retry">Retry</string>
+    <string name="category_icon">Biểu tượng danh mục</string>
 </resources>

@@ -12,9 +12,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class ApiClient {
-    private static final String BASE_URL = "http://128.199.160.180:8080/";
+    private static final String BASE_URL = "http://128.199.160.180/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {
@@ -44,6 +45,9 @@ public class ApiClient {
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(logging)
                     .addInterceptor(authInterceptor)
+                    .connectTimeout(300, TimeUnit.SECONDS)
+                    .readTimeout(300, TimeUnit.SECONDS)
+                    .writeTimeout(300, TimeUnit.SECONDS)
                     .build();
 
             retrofit = new Retrofit.Builder()

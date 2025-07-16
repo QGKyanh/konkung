@@ -297,7 +297,7 @@ public class ProductDetailFragment extends Fragment {
                 public void onResponse(retrofit2.Call<BaseResponse<CartResponse>> call, retrofit2.Response<BaseResponse<CartResponse>> response) {
                     if (response.isSuccessful()) {
                         String message = currentProduct.isPreOrder() ? "Đã thêm vào giỏ hàng (đặt trước)" : "Đã thêm vào giỏ hàng";
-                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                         MainActivity.updateCartBadgeFromFragment(requireActivity());
                         // Optionally: cập nhật UI/badge
                     } else {
@@ -329,14 +329,14 @@ public class ProductDetailFragment extends Fragment {
                 @Override
                 public void onResponse(retrofit2.Call<BaseResponse<CartResponse>> call, retrofit2.Response<BaseResponse<CartResponse>> response) {
                     if (response.isSuccessful()) {
-                        // Navigate to checkout screen
+            // Navigate to checkout screen
                         MainActivity.updateCartBadgeFromFragment(requireActivity());
-                        CheckoutFragment checkoutFragment = new CheckoutFragment();
-                        getParentFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, checkoutFragment)
-                            .addToBackStack(null)
-                            .commit();
+            CheckoutFragment checkoutFragment = new CheckoutFragment();
+            getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, checkoutFragment)
+                .addToBackStack(null)
+                .commit();
                     } else {
                         Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
                     }

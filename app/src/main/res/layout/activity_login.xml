@@ -8,16 +8,17 @@
     android:background="@color/background_light">
 
     <ImageView
+        android:id="@+id/imageViewLogo"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_marginBottom="24dp"
-        android:src="@drawable/ic_milk_logo"
-        android:contentDescription="Milk Store Logo" />
+        android:scaleType="centerCrop"
+        android:contentDescription="Kon Kung Logo" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Milk Store"
+        android:text="Đăng Nhập"
         android:textSize="28sp"
         android:textStyle="bold"
         android:textColor="@color/primary_color"
@@ -26,7 +27,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fresh milk delivered to your door"
+        android:text="Chào mừng bạn đến với Kon Kung"
         android:textSize="16sp"
         android:textColor="@color/text_secondary"
         android:layout_marginBottom="32dp" />
@@ -40,8 +41,8 @@
             android:id="@+id/editTextUsername"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Username"
-            android:inputType="text"
+            android:hint="Tên đăng nhập"
+            android:inputType="textEmailAddress"
             android:background="@drawable/edittext_background"
             android:padding="16dp"
             android:textSize="16sp" />
@@ -57,7 +58,7 @@
             android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Password"
+            android:hint="Mật khẩu"
             android:inputType="textPassword"
             android:background="@drawable/edittext_background"
             android:padding="16dp"
@@ -69,23 +70,14 @@
         android:id="@+id/buttonLogin"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:text="LOGIN"
+        android:text="ĐĂNG NHẬP"
         android:textSize="16sp"
         android:textStyle="bold"
         android:background="@drawable/button_primary"
         android:textColor="@android:color/white"
         android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:id="@+id/textViewForgotPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Forgot Password?"
-        android:textColor="@color/primary_color"
-        android:textSize="14sp"
-        android:layout_marginBottom="24dp"
-        android:clickable="true"
-        android:focusable="true" />
+    <!-- Bỏ dòng Forgot Password -->
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -95,7 +87,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Don't have an account? "
+            android:text="Chưa có tài khoản? "
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
@@ -103,7 +95,7 @@
             android:id="@+id/textViewRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign Up"
+            android:text="Đăng ký"
             android:textColor="@color/primary_color"
             android:textSize="14sp"
             android:textStyle="bold"

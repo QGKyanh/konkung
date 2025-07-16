@@ -24,23 +24,32 @@
                 android:src="@drawable/ic_profile_placeholder"
                 android:background="@drawable/circle_background"
                 android:layout_marginBottom="12dp"
-                android:contentDescription="Profile picture" />
+                android:contentDescription="Ảnh đại diện" />
 
             <TextView
-                android:id="@+id/textViewName"
+                android:id="@+id/textViewFullName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="John Doe"
+                android:text="Họ và tên"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
-                android:layout_marginBottom="4dp" />
+                android:layout_marginBottom="2dp" />
+
+            <TextView
+                android:id="@+id/textViewUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@tendangnhap"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="2dp" />
 
             <TextView
                 android:id="@+id/textViewEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="john.doe@example.com"
+                android:text="email@example.com"
                 android:textSize="14sp"
                 android:textColor="@android:color/white" />
 
@@ -56,7 +65,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="PERSONAL INFORMATION"
+                android:text="THÔNG TIN CÁ NHÂN"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_secondary"
@@ -72,7 +81,7 @@
                     android:id="@+id/textViewPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Phone: Not provided"
+                    android:text="Số điện thoại: Chưa cập nhật"
                     android:textSize="14sp"
                     android:textColor="@color/text_secondary"
                     android:layout_marginBottom="8dp" />
@@ -81,30 +90,11 @@
                     android:id="@+id/textViewAddress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Address: Not provided"
+                    android:text="Địa chỉ: Chưa cập nhật"
                     android:textSize="14sp"
                     android:textColor="@color/text_secondary"
                     android:layout_marginBottom="16dp" />
 
-                <Button
-                    android:id="@+id/buttonEditProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:text="Edit Profile"
-                    android:textSize="14sp"
-                    android:background="@drawable/button_secondary"
-                    android:textColor="@color/primary_color"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/buttonChangePassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:text="Change Password"
-                    android:textSize="14sp"
-                    android:background="@drawable/button_secondary"
-                    android:textColor="@color/primary_color" />
-
             </LinearLayout>
 
             <View
@@ -121,144 +111,12 @@
             android:orientation="vertical"
             android:background="@android:color/white"
             android:layout_marginTop="8dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="APP SETTINGS"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_secondary"
-                android:layout_margin="16dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?android:attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_history"
-                    android:layout_marginEnd="16dp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Order History"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_right" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/divider_color"
-                android:layout_marginStart="56dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?android:attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_notification"
-                    android:layout_marginEnd="16dp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Notifications"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_right" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@android:color/white"
-            android:layout_marginTop="8dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SUPPORT"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_secondary"
-                android:layout_margin="16dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?android:attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_help"
-                    android:layout_marginEnd="16dp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Help &amp; Support"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_right" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/divider_color"
-                android:layout_marginStart="56dp" />
 
             <Button
                 android:id="@+id/buttonLogout"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Logout"
+                android:text="ĐĂNG XUẤT"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:background="@drawable/button_secondary"
@@ -270,7 +128,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Version 1.0.0"
+            android:text="Phiên bản 1.0.0"
             android:textSize="12sp"
             android:textColor="@color/text_secondary"
             android:layout_gravity="center"

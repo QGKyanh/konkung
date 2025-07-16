@@ -240,7 +240,7 @@ public class MapFragment extends Fragment implements LocationListener, StoreAdap
             
             // Update store count
             if (textViewStoreCount != null) {
-                String countText = storeLocations.size() + " stores";
+                String countText = storeLocations.size() + " cửa hàng";
                 textViewStoreCount.setText(countText);
             }
             
