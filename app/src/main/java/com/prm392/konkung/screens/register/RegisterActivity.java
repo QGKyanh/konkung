@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +17,7 @@ import com.prm392.konkung.R;
 import com.prm392.konkung.screens.main.MainActivity;
 import com.prm392.konkung.utils.AuthManager;
 import com.prm392.konkung.repository.AuthRepository;
+import com.bumptech.glide.Glide;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -23,6 +25,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button buttonRegister;
     private TextView textViewLogin;
     private ProgressBar progressBar;
+    private ImageView imageViewLogo;
 
     private AuthRepository authRepository;
     private AuthManager authManager;
@@ -48,6 +51,15 @@ public class RegisterActivity extends AppCompatActivity {
         buttonRegister = findViewById(R.id.buttonRegister);
         textViewLogin = findViewById(R.id.textViewLogin);
         progressBar = findViewById(R.id.progressBar);
+        imageViewLogo = findViewById(R.id.imageViewLogo);
+        if (imageViewLogo != null) {
+            Glide.with(this)
+                .load("https://res.cloudinary.com/doqd4s5no/image/upload/v1752647278/dlpizjbkuiwdqerrwkig.png")
+                .placeholder(R.drawable.ic_milk_logo)
+                .error(R.drawable.ic_milk_logo)
+                .circleCrop()
+                .into(imageViewLogo);
+        }
     }
 
     private void setupClickListeners() {

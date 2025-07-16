@@ -133,7 +133,7 @@ public class ProductRepository {
     public void getProductsByCategory(int categoryId, int page, int pageSize, @NonNull ProductListCallback callback) {
         callback.onLoading();
         
-        Call<BaseResponse<ProductListData>> call = apiService.getProductsByCategory(categoryId, page, pageSize);
+        Call<BaseResponse<ProductListData>> call = apiService.getProductsByCategory(String.valueOf(categoryId), page, pageSize);
         call.enqueue(new Callback<BaseResponse<ProductListData>>() {
             @Override
             public void onResponse(Call<BaseResponse<ProductListData>> call, Response<BaseResponse<ProductListData>> response) {
