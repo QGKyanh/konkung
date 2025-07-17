@@ -2,9 +2,11 @@ package com.prm392.konkung.network;
 
 import com.prm392.konkung.models.Blog;
 import com.prm392.konkung.models.Order;
+import com.prm392.konkung.models.OrderHistory;
 import com.prm392.konkung.models.Product;
 import com.prm392.konkung.network.responses.BaseResponse;
 import com.prm392.konkung.network.responses.BlogListData;
+import com.prm392.konkung.network.responses.OrderHistoryListData;
 import com.prm392.konkung.network.responses.ProductListData;
 import com.prm392.konkung.network.responses.CategoryListData;
 import com.prm392.konkung.repository.AuthRepository.SignUpRequest;
@@ -16,6 +18,7 @@ import com.prm392.konkung.models.UpdateCartItemRequest;
 import com.prm392.konkung.models.CheckoutRequest;
 import com.prm392.konkung.models.CheckoutResponse;
 import com.prm392.konkung.models.Address;
+import com.prm392.konkung.models.OrderDetailResponse;
 
 import java.util.List;
 
@@ -122,4 +125,23 @@ public interface ApiService {
 
     @GET("api/user/account/profile")
     Call<BaseResponse<User>> getUserProfile();
+
+    @GET("api/users/{userId}/orders")
+    Call<BaseResponse<OrderHistoryListData>> getUserOrderHistory(
+            @Path("userId") String userId,
+            @Query("page") int page,
+            @Query("pageSize") int pageSize
+    );
+
+    @GET("api/users/{userId}/orders/{id}")
+    Call<BaseResponse<OrderDetailResponse>> getOrderDetail(
+            @Path("userId") String userId,
+            @Path("id") String orderId
+    );
+
+    @GET("api/order-history")
+    Call<BaseResponse<OrderHistoryListData>> getOrderHistory(
+            @Query("page") int page,
+            @Query("pageSize") int pageSize
+    );
 }
